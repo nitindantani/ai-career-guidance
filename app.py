@@ -10,7 +10,8 @@ model = joblib.load("career_model.pkl")
 encoders = joblib.load("encoders.pkl")
 
 # OpenAI API Key
-openai.api_key = "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"  # <-- Replace this with your real key
+import os
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Home route
 @app.route('/')
