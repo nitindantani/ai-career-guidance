@@ -21,9 +21,15 @@
       <button type="submit">Predict Career</button>
     </form>
 
+    <!-- Unified Result Display -->
     {% if result %}
     <div class="result">
       <strong>Predicted Career:</strong> {{ result }}
+    </div>
+    {% elif chat_answer %}
+    <div class="result">
+      <strong>AI Suggested Career Path:</strong>
+      <p>{{ chat_answer }}</p>
     </div>
     {% endif %}
 
@@ -35,7 +41,7 @@
         <button type="submit">Ask</button>
       </form>
 
-      {% if chat_answer %}
+      {% if chat_answer and not result %}
       <div class="chat-response">
         <strong>AI Assistant:</strong>
         <p>{{ chat_answer }}</p>
