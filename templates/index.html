@@ -1,75 +1,155 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Career Guidance System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: Arial; margin: 40px; background: #f9f9f9; }
-        form { background: #fff; padding: 20px; border-radius: 10px; max-width: 600px; margin: auto; box-shadow: 0 0 10px #ccc; }
-        select, input[type="text"] { width: 100%; padding: 10px; margin-bottom: 15px; }
-        input[type="submit"] { padding: 10px 20px; background: #4CAF50; color: #fff; border: none; border-radius: 5px; }
-        h2 { text-align: center; }
-        .result { background: #e3f2fd; padding: 15px; border-left: 5px solid #2196F3; margin-top: 20px; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 20px;
+            background: #ffffff;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+        }
+
+        h2, h3 {
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .result {
+            margin-top: 20px;
+            background: #e3f2fd;
+            padding: 15px;
+            border-left: 5px solid #2196F3;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+
+            input[type="submit"] {
+                font-size: 15px;
+            }
+
+            select, input[type="text"] {
+                font-size: 15px;
+            }
+        }
     </style>
+    <script>
+        function updateSuggestions() {
+            const form = document.querySelector('form[action="/predict"]');
+            form.submit();
+        }
+    </script>
 </head>
 <body>
-    <h2>AI-Based Career Guidance</h2>
-    <form method="POST" action="/predict">
-        <label>Stream</label>
-        <select name="stream">
-            {% for option in suggestions.streams %}
-            <option value="{{ option }}">{{ option|capitalize }}</option>
-            {% endfor %}
-        </select>
+    <div class="container">
+        <h2>AI-Based Career Guidance</h2>
+        <form method="POST" action="/predict">
+            <label>Stream</label>
+            <select name="stream" onchange="updateSuggestions()">
+                <option value="">Select Stream</option>
+                {% for stream in streams %}
+                <option value="{{ stream }}" {% if request.form.get('stream') == stream %}selected{% endif %}>{{ stream|capitalize }}</option>
+                {% endfor %}
+            </select>
 
-        <label>Subject You Like</label>
-        <select name="subject_liked">
-            {% for option in suggestions.subjects %}
-            <option value="{{ option }}">{{ option|capitalize }}</option>
-            {% endfor %}
-        </select>
+            <label>Subject You Like</label>
+            <select name="subject_liked">
+                {% for option in suggestions.subjects %}
+                <option value="{{ option }}" {% if request.form.get('subject_liked') == option %}selected{% endif %}>{{ option|capitalize }}</option>
+                {% endfor %}
+            </select>
 
-        <label>Technical Skills</label>
-        <select name="skills">
-            {% for option in suggestions.skills %}
-            <option value="{{ option }}">{{ option|capitalize }}</option>
-            {% endfor %}
-        </select>
+            <label>Technical Skills</label>
+            <select name="skills">
+                {% for option in suggestions.skills %}
+                <option value="{{ option }}" {% if request.form.get('skills') == option %}selected{% endif %}>{{ option|capitalize }}</option>
+                {% endfor %}
+            </select>
 
-        <label>Soft Skills</label>
-        <select name="soft_skill">
-            {% for option in suggestions.soft_skills %}
-            <option value="{{ option }}">{{ option|capitalize }}</option>
-            {% endfor %}
-        </select>
+            <label>Soft Skills</label>
+            <select name="soft_skill">
+                {% for option in suggestions.soft_skills %}
+                <option value="{{ option }}" {% if request.form.get('soft_skill') == option %}selected{% endif %}>{{ option|capitalize }}</option>
+                {% endfor %}
+            </select>
 
-        <label>Preferred Field</label>
-        <select name="preferred_field">
-            {% for option in suggestions.preferred_fields %}
-            <option value="{{ option }}">{{ option|capitalize }}</option>
-            {% endfor %}
-        </select>
+            <label>Preferred Field</label>
+            <select name="preferred_field">
+                {% for option in suggestions.preferred_fields %}
+                <option value="{{ option }}" {% if request.form.get('preferred_field') == option %}selected{% endif %}>{{ option|capitalize }}</option>
+                {% endfor %}
+            </select>
 
-        <input type="submit" value="Get Career Prediction">
-    </form>
+            <input type="submit" value="Get Career Prediction">
+        </form>
 
-    {% if result %}
-    <div class="result">
-        <strong>Prediction Result:</strong><br>
-        {{ result }}
+        {% if result %}
+        <div class="result">
+            <strong>Prediction Result:</strong><br>
+            {{ result }}
+        </div>
+        {% endif %}
+
+        <form method="POST" action="/chat">
+            <h3>Ask AI Career Questions</h3>
+            <input type="text" name="question" placeholder="e.g. What career is best for a coder?" required>
+            <input type="submit" value="Ask AI">
+        </form>
+
+        {% if chat_answer %}
+        <div class="result">
+            <strong>AI Answer:</strong><br>
+            {{ chat_answer }}
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
-
-    <form method="POST" action="/chat">
-        <h3>Ask AI Career Questions</h3>
-        <input type="text" name="question" placeholder="e.g. What career is best for a coder?">
-        <input type="submit" value="Ask AI">
-    </form>
-
-    {% if chat_answer %}
-    <div class="result">
-        <strong>AI Answer:</strong><br>
-        {{ chat_answer }}
-    </div>
-    {% endif %}
 </body>
 </html>
