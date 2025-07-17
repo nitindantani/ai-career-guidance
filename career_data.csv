@@ -1,21 +1,201 @@
 stream,subject_liked,skills,soft_skill,preferred_field,career_label
-Science,Math,Data Analysis,Communication,Engineering,Data Analyst
-Commerce,Business,Marketing,Creativity,Management,Marketing Executive
-Arts,History,Writing,Public Speaking,Media,Journalist
-Science,Physics,AI,Problem Solving,IT,Machine Learning Engineer
-Commerce,Economics,Finance,Analytical,Finance,Financial Analyst
-Arts,English,Editing,Teamwork,Publishing,Content Writer
-Science,Biology,Research,Detail Oriented,Healthcare,Research Scientist
-Science,Chemistry,Coding,Logical Thinking,Software,Software Developer
-Commerce,Accounts,Excel,Leadership,Accounting,Accountant
-Arts,Political Science,Creativity,Empathy,Law,Lawyer
-Science,Math,Data Analysis,Communication,Engineering,Data Analyst
-Commerce,Economics,Finance,Decision Making,Finance,Banker
-Arts,English,Content Creation,Teamwork,Media,Blogger
-Science,Physics,Python,Analytical,IT,AI Engineer
-Commerce,Business,Marketing,Creativity,Business,Business Analyst
-Arts,History,Editing,Critical Thinking,Humanities,Historian
-Science,Biology,Lab Work,Patience,Medical,Doctor
-Commerce,Business,Excel,Leadership,Finance,Investment Analyst
-Arts,History,Debating,Empathy,Politics,Politician
-Science,Chemistry,Experimenting,Collaboration,Research,Lab Technician
+Science,History,Python,Adaptability,Engineering,Data Scientist
+Biology,Computer Science,Finance,Adaptability,Media,Teacher
+Engineering,Physics,Java,Problem Solving,Media,Graphic Designer
+Computer Science,Physics,Machine Learning,Problem Solving,Law,Data Scientist
+Science,Economics,Finance,Creativity,Design,Network Engineer
+Biology,History,Web Development,Teamwork,IT,Lawyer
+Biology,History,Biotech,Communication,Education,Lawyer
+Biology,Computer Science,Finance,Creativity,Healthcare,Software Developer
+Engineering,Computer Science,Finance,Communication,Engineering,Teacher
+Arts,Computer Science,Networking,Adaptability,Education,Teacher
+Arts,History,Biotech,Creativity,IT,Journalist
+Commerce,Math,Design,Creativity,IT,Graphic Designer
+Biology,Chemistry,Machine Learning,Leadership,Education,Civil Engineer
+Commerce,Chemistry,Web Development,Teamwork,Media,Psychologist
+Commerce,Computer Science,Design,Critical Thinking,Engineering,Software Developer
+Engineering,History,Marketing,Communication,Education,Teacher
+Commerce,Computer Science,Finance,Teamwork,Media,Psychologist
+Biology,Economics,Design,Problem Solving,Law,Entrepreneur
+Science,English,C++,Leadership,Law,Entrepreneur
+Computer Science,Chemistry,Networking,Problem Solving,Finance,Marketing Manager
+Engineering,Computer Science,Networking,Leadership,Media,Data Scientist
+Engineering,Computer Science,Biotech,Critical Thinking,Engineering,Marketing Manager
+Biology,English,Python,Critical Thinking,Entrepreneurship,Financial Analyst
+Engineering,Economics,Python,Teamwork,Law,Marketing Manager
+Engineering,Physics,C++,Teamwork,Media,Psychologist
+Biology,Economics,Machine Learning,Adaptability,Entrepreneurship,Chartered Accountant
+Computer Science,Math,Marketing,Leadership,Design,Marketing Manager
+Computer Science,Math,Networking,Creativity,Entrepreneurship,Graphic Designer
+Commerce,Math,Finance,Creativity,Education,Civil Engineer
+Commerce,Economics,Biotech,Leadership,Law,Research Scientist
+Commerce,Economics,Java,Teamwork,Healthcare,Business Analyst
+Biology,Economics,Biotech,Problem Solving,Finance,Teacher
+Engineering,Biology,Design,Critical Thinking,IT,Marketing Manager
+Science,Chemistry,Web Development,Leadership,Design,Teacher
+Commerce,Math,C++,Communication,Engineering,Teacher
+Biology,Economics,C++,Creativity,Education,Doctor
+Arts,Math,Python,Leadership,Law,Psychologist
+Arts,Biology,Machine Learning,Adaptability,Finance,Entrepreneur
+Computer Science,Computer Science,Java,Creativity,Education,Financial Analyst
+Commerce,Physics,Biotech,Leadership,Design,Journalist
+Engineering,Biology,Java,Critical Thinking,Media,Teacher
+Science,Physics,Web Development,Problem Solving,IT,Business Analyst
+Science,Physics,Marketing,Problem Solving,Finance,Teacher
+Science,Math,Machine Learning,Teamwork,Finance,Civil Engineer
+Commerce,Math,Networking,Communication,Entrepreneurship,Doctor
+Engineering,Math,Web Development,Adaptability,Research,Chartered Accountant
+Biology,Math,Machine Learning,Creativity,Finance,Financial Analyst
+Computer Science,English,Biotech,Creativity,Research,Software Developer
+Commerce,Biology,Marketing,Leadership,Law,Business Analyst
+Engineering,English,Machine Learning,Teamwork,Design,Business Analyst
+Commerce,History,Machine Learning,Critical Thinking,Education,Financial Analyst
+Commerce,Computer Science,Design,Leadership,Finance,Entrepreneur
+Arts,English,Machine Learning,Adaptability,Education,Lawyer
+Commerce,Economics,Networking,Communication,Entrepreneurship,Marketing Manager
+Commerce,Math,Machine Learning,Leadership,Healthcare,Business Analyst
+Commerce,Computer Science,Python,Leadership,Law,UX Designer
+Engineering,Computer Science,Biotech,Creativity,Education,Data Scientist
+Engineering,Biology,Machine Learning,Problem Solving,Research,Graphic Designer
+Arts,Chemistry,Finance,Adaptability,IT,UX Designer
+Commerce,Math,Networking,Teamwork,Design,Web Developer
+Biology,Physics,Design,Problem Solving,Engineering,Business Analyst
+Engineering,Physics,Python,Adaptability,Research,Doctor
+Arts,Chemistry,Networking,Teamwork,Healthcare,Web Developer
+Commerce,Chemistry,Machine Learning,Teamwork,Education,Graphic Designer
+Biology,Biology,Java,Problem Solving,Healthcare,Civil Engineer
+Engineering,Math,Machine Learning,Communication,Engineering,Psychologist
+Commerce,Biology,Marketing,Creativity,Media,Network Engineer
+Engineering,Chemistry,Networking,Leadership,IT,Entrepreneur
+Arts,History,Python,Adaptability,Finance,Entrepreneur
+Computer Science,Math,Biotech,Creativity,Healthcare,UX Designer
+Engineering,Biology,C++,Problem Solving,Media,Graphic Designer
+Arts,Computer Science,Networking,Critical Thinking,IT,Entrepreneur
+Biology,Biology,Networking,Leadership,Media,Chartered Accountant
+Science,History,Machine Learning,Creativity,Engineering,Network Engineer
+Commerce,History,Python,Communication,Healthcare,Teacher
+Arts,English,Web Development,Critical Thinking,Entrepreneurship,UX Designer
+Computer Science,Biology,Design,Teamwork,Design,Web Developer
+Science,Computer Science,Biotech,Critical Thinking,Healthcare,Financial Analyst
+Engineering,Biology,Web Development,Communication,Finance,Web Developer
+Arts,Math,Marketing,Leadership,Law,Software Developer
+Science,History,Java,Leadership,Design,Business Analyst
+Science,History,C++,Adaptability,Law,Psychologist
+Computer Science,Biology,Finance,Leadership,Finance,Teacher
+Science,English,Marketing,Adaptability,Engineering,Graphic Designer
+Computer Science,Computer Science,Biotech,Teamwork,Healthcare,Research Scientist
+Arts,Computer Science,Python,Adaptability,IT,Research Scientist
+Science,English,Java,Adaptability,Entrepreneurship,UX Designer
+Arts,Math,Networking,Critical Thinking,Finance,Research Scientist
+Biology,Biology,Web Development,Adaptability,Entrepreneurship,Chartered Accountant
+Science,Biology,Java,Creativity,Research,Marketing Manager
+Biology,History,Finance,Problem Solving,Design,Marketing Manager
+Science,Biology,C++,Teamwork,Finance,Data Scientist
+Commerce,Economics,Biotech,Critical Thinking,Research,Data Scientist
+Commerce,Economics,Biotech,Critical Thinking,IT,Civil Engineer
+Engineering,History,C++,Leadership,Law,Software Developer
+Science,Economics,Java,Adaptability,Engineering,Network Engineer
+Engineering,Math,Python,Leadership,Education,Chartered Accountant
+Biology,English,Design,Teamwork,Research,Teacher
+Biology,History,Java,Problem Solving,Entrepreneurship,Entrepreneur
+Computer Science,Chemistry,C++,Problem Solving,Engineering,Web Developer
+Computer Science,English,Marketing,Communication,Law,Civil Engineer
+Commerce,Math,Marketing,Communication,Design,Psychologist
+Engineering,History,Design,Creativity,Entrepreneurship,Entrepreneur
+Science,Math,Design,Problem Solving,Media,Research Scientist
+Biology,Chemistry,C++,Critical Thinking,Media,Civil Engineer
+Arts,Economics,Design,Critical Thinking,Entrepreneurship,Journalist
+Science,Chemistry,Python,Leadership,Education,Civil Engineer
+Arts,Economics,Web Development,Leadership,Law,Entrepreneur
+Computer Science,English,Machine Learning,Creativity,Entrepreneurship,Marketing Manager
+Arts,History,C++,Communication,Media,Journalist
+Commerce,History,C++,Communication,Research,Lawyer
+Commerce,Math,Marketing,Leadership,Entrepreneurship,Journalist
+Engineering,Physics,Marketing,Communication,Law,Financial Analyst
+Engineering,Economics,Design,Teamwork,Engineering,UX Designer
+Computer Science,Math,Biotech,Critical Thinking,Education,UX Designer
+Commerce,Chemistry,Python,Creativity,Design,Journalist
+Science,Math,Python,Communication,Entrepreneurship,Lawyer
+Computer Science,Economics,Biotech,Leadership,Healthcare,Network Engineer
+Commerce,History,Marketing,Adaptability,Research,Data Scientist
+Engineering,History,Design,Critical Thinking,Media,Teacher
+Engineering,Chemistry,Machine Learning,Teamwork,Media,Research Scientist
+Arts,History,Finance,Critical Thinking,IT,Teacher
+Biology,Chemistry,Machine Learning,Critical Thinking,IT,Business Analyst
+Arts,Computer Science,Finance,Teamwork,Design,Business Analyst
+Science,Math,Networking,Teamwork,Design,Data Scientist
+Commerce,History,Marketing,Leadership,IT,Doctor
+Biology,Chemistry,Biotech,Leadership,Law,Data Scientist
+Biology,Economics,Marketing,Teamwork,Finance,Doctor
+Science,Biology,Design,Problem Solving,Design,Civil Engineer
+Computer Science,Physics,Web Development,Leadership,Design,Journalist
+Science,Computer Science,C++,Adaptability,Healthcare,Marketing Manager
+Arts,Physics,C++,Problem Solving,Entrepreneurship,Software Developer
+Commerce,Computer Science,Design,Leadership,Engineering,Journalist
+Engineering,Economics,Java,Creativity,Design,Data Scientist
+Computer Science,Math,Web Development,Teamwork,IT,Journalist
+Computer Science,Biology,C++,Critical Thinking,Design,Graphic Designer
+Engineering,Biology,Python,Leadership,Healthcare,Marketing Manager
+Engineering,Economics,Python,Communication,Law,Research Scientist
+Science,Math,Finance,Critical Thinking,Entrepreneurship,Web Developer
+Commerce,Math,Biotech,Critical Thinking,IT,Network Engineer
+Commerce,Math,Biotech,Adaptability,Media,Doctor
+Biology,Computer Science,Python,Problem Solving,Healthcare,Doctor
+Arts,Physics,Web Development,Teamwork,Engineering,Business Analyst
+Arts,English,Networking,Teamwork,Finance,Business Analyst
+Computer Science,Computer Science,Biotech,Communication,Engineering,Psychologist
+Science,Chemistry,C++,Communication,Law,Teacher
+Commerce,English,C++,Leadership,Design,Doctor
+Arts,Economics,Finance,Creativity,Design,Financial Analyst
+Computer Science,Chemistry,Finance,Teamwork,Education,Research Scientist
+Computer Science,History,Web Development,Leadership,Research,Web Developer
+Computer Science,Physics,Biotech,Adaptability,Finance,Marketing Manager
+Arts,Physics,Python,Critical Thinking,Research,Lawyer
+Commerce,Math,Design,Critical Thinking,Research,Entrepreneur
+Commerce,Physics,Java,Problem Solving,Education,Psychologist
+Computer Science,Math,Machine Learning,Leadership,Education,UX Designer
+Engineering,Economics,Python,Problem Solving,Healthcare,Marketing Manager
+Computer Science,Economics,Marketing,Communication,Media,Psychologist
+Engineering,English,Networking,Creativity,IT,Data Scientist
+Engineering,Math,Marketing,Critical Thinking,IT,Business Analyst
+Arts,Physics,Web Development,Adaptability,Media,Software Developer
+Engineering,Biology,C++,Critical Thinking,Design,Marketing Manager
+Arts,Chemistry,Machine Learning,Teamwork,Engineering,Lawyer
+Biology,Math,Python,Creativity,Entrepreneurship,Graphic Designer
+Commerce,Computer Science,Networking,Teamwork,IT,Financial Analyst
+Science,Computer Science,Web Development,Critical Thinking,Entrepreneurship,Web Developer
+Commerce,Computer Science,Python,Communication,Education,Doctor
+Computer Science,History,C++,Problem Solving,Entrepreneurship,Psychologist
+Arts,Computer Science,Web Development,Leadership,Finance,Network Engineer
+Engineering,Biology,Python,Critical Thinking,IT,Research Scientist
+Arts,History,Design,Teamwork,Finance,Network Engineer
+Computer Science,Math,Finance,Communication,Healthcare,Chartered Accountant
+Arts,Math,Networking,Teamwork,Education,Entrepreneur
+Arts,Biology,Java,Critical Thinking,IT,Teacher
+Engineering,Biology,Java,Teamwork,Research,Doctor
+Commerce,Biology,Machine Learning,Teamwork,Media,Financial Analyst
+Arts,English,Python,Problem Solving,Entrepreneurship,Network Engineer
+Commerce,Chemistry,Finance,Communication,Design,Network Engineer
+Biology,Biology,C++,Teamwork,Healthcare,Graphic Designer
+Science,Biology,Networking,Leadership,Finance,Chartered Accountant
+Arts,Biology,Web Development,Critical Thinking,Law,Financial Analyst
+Biology,Math,Marketing,Critical Thinking,Education,UX Designer
+Computer Science,Economics,Web Development,Leadership,Law,Journalist
+Computer Science,Math,Machine Learning,Problem Solving,Engineering,Lawyer
+Engineering,Biology,C++,Creativity,Healthcare,Entrepreneur
+Commerce,English,Marketing,Problem Solving,Research,Marketing Manager
+Biology,History,Web Development,Critical Thinking,Law,Journalist
+Biology,Math,Python,Adaptability,Finance,Financial Analyst
+Engineering,English,Marketing,Leadership,Entrepreneurship,Web Developer
+Biology,Chemistry,Marketing,Creativity,Education,Doctor
+Science,Math,C++,Creativity,Research,UX Designer
+Engineering,History,Java,Creativity,Media,Business Analyst
+Science,Physics,Machine Learning,Teamwork,Design,Journalist
+Computer Science,Economics,Python,Critical Thinking,Finance,Web Developer
+Science,History,Marketing,Problem Solving,IT,UX Designer
+Biology,English,C++,Leadership,Research,Web Developer
+Science,Math,Machine Learning,Communication,Research,Marketing Manager
+Engineering,Chemistry,Marketing,Teamwork,Finance,Graphic Designer
+Science,Economics,Networking,Teamwork,Engineering,Entrepreneur
+Science,Biology,Machine Learning,Problem Solving,Design,Business Analyst
+Science,Economics,Python,Creativity,Media,Teacher
