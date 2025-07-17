@@ -14,20 +14,37 @@ target_encoder = joblib.load("target_encoder.pkl")
 # OpenAI API key
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# Load suggestions
+# Load career data
 df = pd.read_csv("career_data.csv")
 df = df.apply(lambda col: col.str.lower().str.strip() if col.dtype == 'object' else col)
-suggestions = {
-    'streams': sorted(df['stream'].dropna().unique()),
-    'subjects': sorted(df['subject_liked'].dropna().unique()),
-    'skills': sorted(df['skills'].dropna().unique()),
-    'soft_skills': sorted(df['soft_skill'].dropna().unique()),
-    'preferred_fields': sorted(df['preferred_field'].dropna().unique()),
-}
+
+# Preload unique streams
+streams = sorted(df['stream'].dropna().unique())
+
+# Group data by stream for dependent dropdowns
+grouped_data = df.groupby('stream')
+
+def get_options_for_stream(stream):
+    stream = stream.lower().strip()
+    if stream in grouped_data.groups:
+        group = grouped_data.get_group(stream)
+        return {
+            'subjects': sorted(group['subject_liked'].dropna().unique()),
+            'skills': sorted(group['skills'].dropna().unique()),
+            'soft_skills': sorted(group['soft_skill'].dropna().unique()),
+            'preferred_fields': sorted(group['preferred_field'].dropna().unique())
+        }
+    else:
+        return {
+            'subjects': [],
+            'skills': [],
+            'soft_skills': [],
+            'preferred_fields': []
+        }
 
 @app.route('/')
 def home():
-    return render_template("index.html", suggestions=suggestions)
+    return render_template("index.html", streams=streams, suggestions={})
 
 @app.route("/predict", methods=["POST"])
 def predict():
@@ -36,7 +53,8 @@ def predict():
         inputs = [request.form.get(f, "").strip().lower() for f in fields]
 
         if not all(inputs):
-            return render_template("index.html", suggestions=suggestions, result="Please fill all fields.")
+            suggestions = get_options_for_stream(inputs[0]) if inputs[0] else {}
+            return render_template("index.html", streams=streams, suggestions=suggestions, result="Please fill all fields.")
 
         encoded = []
         for field, val in zip(fields, inputs):
@@ -65,7 +83,8 @@ def predict():
         except:
             result = "Sorry, we couldn't process your input."
 
-    return render_template("index.html", suggestions=suggestions, result=result)
+    suggestions = get_options_for_stream(inputs[0])
+    return render_template("index.html", streams=streams, suggestions=suggestions, result=result)
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -78,7 +97,7 @@ def chat():
         answer = response['choices'][0]['message']['content']
     except:
         answer = "Sorry, I couldn't answer that."
-    return render_template("index.html", suggestions=suggestions, chat_answer=answer)
+    return render_template("index.html", streams=streams, suggestions={}, chat_answer=answer)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
