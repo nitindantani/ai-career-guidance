@@ -9,76 +9,61 @@ app = Flask(__name__)
 # Load model and encoders
 model = joblib.load("career_model.pkl")
 encoders = joblib.load("encoders.pkl")
-target_encoder = joblib.load("target_encoder.pkl")  # ensure you have this
 
 # Set OpenAI API Key
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# Home route
+# Home page
 @app.route('/')
 def home():
     return render_template("index.html")
 
-# Prediction route
+# Career Prediction route
 @app.route('/predict', methods=["POST"])
 def predict():
-    input_fields = ['stream', 'subject_liked', 'skills', 'soft_skill', 'preferred_field']
-    inputs = [request.form.get(field) for field in input_fields]
-
+    inputs = [request.form.get(field) for field in ['stream', 'subject_liked', 'skills', 'soft_skill', 'preferred_field']]
     try:
-        # Try encoding and prediction
         encoded = [encoders[col].transform([val])[0] for col, val in zip(encoders, inputs)]
         prediction = model.predict([encoded])[0]
-        result = target_encoder.inverse_transform([prediction])[0]
-        return render_template("index.html", result=result)
-    except Exception as e:
-        print("Prediction Error:", e)
-
-        # Fallback: Use OpenAI to suggest a career based on raw input
-        prompt = (
-            "The user entered the following career-related info:\n"
-            f"Stream: {inputs[0]}\n"
-            f"Subject Liked: {inputs[1]}\n"
-            f"Skills: {inputs[2]}\n"
-            f"Soft Skill: {inputs[3]}\n"
-            f"Preferred Field: {inputs[4]}\n\n"
-            "Based on this, suggest the most suitable career path or advice."
-        )
-
+        result = encoders['career_label'].inverse_transform([prediction])[0]
+    except Exception:
+        # On failure, use OpenAI to give a suggested career path
+        prompt = f"""
+        A student entered:
+        - Stream: {inputs[0]}
+        - Subject Liked: {inputs[1]}
+        - Technical Skills: {inputs[2]}
+        - Soft Skills: {inputs[3]}
+        - Preferred Field: {inputs[4]}
+        
+        Based on this input, suggest a few suitable career options. Make it helpful and relevant.
+        """
         try:
             response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": "You are an expert career counselor."},
-                    {"role": "user", "content": prompt}
-                ]
+                messages=[{"role": "user", "content": prompt}]
             )
-            fallback_answer = response['choices'][0]['message']['content']
-        except Exception as api_error:
-            print("ChatGPT Fallback Error:", api_error)
-            fallback_answer = "Sorry, we couldn’t process your request. Please try again."
+            result = "Model could not predict accurately. Here's a helpful suggestion:\n\n" + response['choices'][0]['message']['content']
+        except Exception as e:
+            result = "Sorry, we couldn't process your input. Please try again."
 
-        return render_template("index.html", chat_answer=fallback_answer)
+    return render_template("index.html", result=result)
 
-# ChatGPT route
+# Chat route for AI career Q&A
 @app.route('/chat', methods=["POST"])
 def chat():
     user_question = request.form.get("question")
     try:
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a helpful AI career counselor."},
-                {"role": "user", "content": user_question}
-            ]
+            messages=[{"role": "user", "content": user_question}]
         )
         answer = response['choices'][0]['message']['content']
     except Exception as e:
-        print("ChatGPT Error:", e)
-        answer = "Something went wrong while contacting the AI."
-
+        answer = "Sorry, I couldn't answer your question right now."
     return render_template("index.html", chat_answer=answer)
 
-# Run app
+# Run app (Render-compatible)
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
