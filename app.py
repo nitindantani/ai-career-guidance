@@ -15,7 +15,7 @@ encoders = joblib.load("encoders.pkl")
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Load CSV for suggestions
-df = pd.read_csv("fead6908-8b0c-4f82-be0e-52c25b9499b8.csv")
+df = pd.read_csv("career_data.csv")
 suggestions = {
     'streams': sorted(df['stream'].dropna().unique()),
     'subjects': sorted(df['subject_liked'].dropna().unique()),
