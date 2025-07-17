@@ -4,24 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AI Career Guidance System</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
   <div class="container">
     <h1>🎓 AI Career Guidance System</h1>
 
-    <!-- Career Prediction Form -->
     <form method="POST" action="/predict" class="form">
       <h3>🧠 Get Career Suggestions</h3>
-      <input type="text" name="stream" placeholder="Your Stream (e.g., Science)" required>
-      <input type="text" name="subject_liked" placeholder="Subject You Like" required>
-      <input type="text" name="skills" placeholder="Your Technical Skills" required>
-      <input type="text" name="soft_skill" placeholder="Your Soft Skill" required>
-      <input type="text" name="preferred_field" placeholder="Preferred Field (e.g., IT)" required>
+      <input type="text" name="stream" list="stream-options" placeholder="Your Stream" required>
+      <input type="text" name="subject_liked" list="subject_liked-options" placeholder="Subject You Like" required>
+      <input type="text" name="skills" list="skills-options" placeholder="Your Technical Skills" required>
+      <input type="text" name="soft_skill" list="soft_skill-options" placeholder="Your Soft Skill" required>
+      <input type="text" name="preferred_field" list="preferred_field-options" placeholder="Preferred Field" required>
       <button type="submit">Predict Career</button>
     </form>
 
-    <!-- Unified Result Display -->
     {% if result %}
     <div class="result">
       <strong>Predicted Career:</strong> {{ result }}
@@ -33,7 +31,6 @@
     </div>
     {% endif %}
 
-    <!-- Chatbox -->
     <div class="chatbox">
       <h3>💬 Ask the AI Career Assistant</h3>
       <form action="/chat" method="post">
@@ -49,58 +46,78 @@
       {% endif %}
     </div>
   </div>
+
+  <script>
+    async function loadSuggestions() {
+      const res = await fetch('/suggestions');
+      const data = await res.json();
+
+      for (const field in data) {
+        const datalist = document.createElement('datalist');
+        datalist.id = field + '-options';
+        data[field].forEach(item => {
+          const option = document.createElement('option');
+          option.value = item;
+          datalist.appendChild(option);
+        });
+        document.body.appendChild(datalist);
+      }
+    }
+    window.onload = loadSuggestions;
+  </script>
 </body>
 </html>
 
-<style style.css>
-    body {
-    font-family: 'Segoe UI', sans-serif;
-    background: #f7f9fc;
-    margin: 0;
-    padding: 0;
-    }
 
-    .container {
-    max-width: 600px;
-    margin: 40px auto;
-    padding: 20px;
-    background: white;
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    border-radius: 12px;
-    }
+/* ==== static/style.css ==== */
 
-    h1, h3 {
-    text-align: center;
-    color: #2b6777;
-    }
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #f7f9fc;
+  margin: 0;
+  padding: 0;
+}
 
-    .form input, .form button,
-    .chatbox input, .chatbox button {
-    width: 100%;
-    padding: 12px;
-    margin-top: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 15px;
-    }
+.container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+  background: white;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  border-radius: 12px;
+}
 
-    .form button, .chatbox button {
-    background-color: #52ab98;
-    color: white;
-    border: none;
-    cursor: pointer;
-    }
+h1, h3 {
+  text-align: center;
+  color: #2b6777;
+}
 
-    .form button:hover, .chatbox button:hover {
-    background-color: #2b6777;
-    }
+.form input, .form button,
+.chatbox input, .chatbox button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+}
 
-    .result, .chat-response {
-    margin-top: 20px;
-    padding: 15px;
-    background-color: #e2f0d9;
-    border-left: 5px solid #28a745;
-    border-radius: 8px;
-    font-size: 16px;
-    }
-</style>
+.form button, .chatbox button {
+  background-color: #52ab98;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.form button:hover, .chatbox button:hover {
+  background-color: #2b6777;
+}
+
+.result, .chat-response {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #e2f0d9;
+  border-left: 5px solid #28a745;
+  border-radius: 8px;
+  font-size: 16px;
+}
