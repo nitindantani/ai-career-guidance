@@ -8,7 +8,10 @@ import joblib
 # Load the data
 df = pd.read_csv("career_data.csv")
 
-# Separate the target column
+# Normalize string fields
+df = df.apply(lambda col: col.str.lower().str.strip() if col.dtype == 'object' else col)
+
+# Separate target and features
 target_col = "career_label"
 feature_cols = [col for col in df.columns if col != target_col]
 
@@ -19,11 +22,11 @@ for col in feature_cols:
     df[col] = le.fit_transform(df[col])
     encoders[col] = le
 
-# Encode target separately
+# Encode target
 target_encoder = LabelEncoder()
 df[target_col] = target_encoder.fit_transform(df[target_col])
 
-# Prepare training data
+# Train/test split
 X = df[feature_cols]
 y = df[target_col]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -32,10 +35,10 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 model = RandomForestClassifier(n_estimators=100, random_state=42)
 model.fit(X_train, y_train)
 
-# Evaluate model
+# Evaluate
 y_pred = model.predict(X_test)
-print("\nModel Accuracy:", accuracy_score(y_test, y_pred))
-print("\nClassification Report:\n", classification_report(y_test, y_pred))
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print(classification_report(y_test, y_pred))
 
 # Save model and encoders
 joblib.dump(model, "career_model.pkl")
