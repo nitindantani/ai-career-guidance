@@ -1,141 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>AI Career Guidance System</title>
+    <title>Career Guidance System</title>
     <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #f7f9fc;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 40px auto;
-            padding: 20px;
-            background: white;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
-            border-radius: 12px;
-        }
-
-        h1, h3 {
-            text-align: center;
-            color: #2b6777;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: bold;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 15px;
-        }
-
-        button {
-            padding: 12px 20px;
-            background-color: #52ab98;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #2b6777;
-        }
-
-        .result, .chat-response {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #e2f0d9;
-            border-left: 5px solid #28a745;
-            border-radius: 8px;
-            font-size: 16px;
-        }
+        body { font-family: Arial; margin: 40px; background: #f9f9f9; }
+        form { background: #fff; padding: 20px; border-radius: 10px; max-width: 600px; margin: auto; box-shadow: 0 0 10px #ccc; }
+        select, input[type="text"] { width: 100%; padding: 10px; margin-bottom: 15px; }
+        input[type="submit"] { padding: 10px 20px; background: #4CAF50; color: #fff; border: none; border-radius: 5px; }
+        h2 { text-align: center; }
+        .result { background: #e3f2fd; padding: 15px; border-left: 5px solid #2196F3; margin-top: 20px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>AI Career Guidance System</h1>
+    <h2>AI-Based Career Guidance</h2>
+    <form method="POST" action="/predict">
+        <label>Stream</label>
+        <select name="stream">
+            {% for option in suggestions.streams %}
+            <option value="{{ option }}">{{ option|capitalize }}</option>
+            {% endfor %}
+        </select>
 
-        <form method="POST" action="/predict">
-            <div class="form-group">
-                <label for="stream">Stream</label>
-                <input list="stream-options" name="stream" id="stream">
-                <datalist id="stream-options">
-                    {% for item in suggestions.streams %}<option value="{{ item }}">{% endfor %}
-                </datalist>
-            </div>
+        <label>Subject You Like</label>
+        <select name="subject_liked">
+            {% for option in suggestions.subjects %}
+            <option value="{{ option }}">{{ option|capitalize }}</option>
+            {% endfor %}
+        </select>
 
-            <div class="form-group">
-                <label for="subject_liked">Subject Liked</label>
-                <input list="subject-options" name="subject_liked" id="subject_liked">
-                <datalist id="subject-options">
-                    {% for item in suggestions.subjects %}<option value="{{ item }}">{% endfor %}
-                </datalist>
-            </div>
+        <label>Technical Skills</label>
+        <select name="skills">
+            {% for option in suggestions.skills %}
+            <option value="{{ option }}">{{ option|capitalize }}</option>
+            {% endfor %}
+        </select>
 
-            <div class="form-group">
-                <label for="skills">Technical Skills</label>
-                <input list="skills-options" name="skills" id="skills">
-                <datalist id="skills-options">
-                    {% for item in suggestions.skills %}<option value="{{ item }}">{% endfor %}
-                </datalist>
-            </div>
+        <label>Soft Skills</label>
+        <select name="soft_skill">
+            {% for option in suggestions.soft_skills %}
+            <option value="{{ option }}">{{ option|capitalize }}</option>
+            {% endfor %}
+        </select>
 
-            <div class="form-group">
-                <label for="soft_skill">Soft Skills</label>
-                <input list="soft-skills-options" name="soft_skill" id="soft_skill">
-                <datalist id="soft-skills-options">
-                    {% for item in suggestions.soft_skills %}<option value="{{ item }}">{% endfor %}
-                </datalist>
-            </div>
+        <label>Preferred Field</label>
+        <select name="preferred_field">
+            {% for option in suggestions.preferred_fields %}
+            <option value="{{ option }}">{{ option|capitalize }}</option>
+            {% endfor %}
+        </select>
 
-            <div class="form-group">
-                <label for="preferred_field">Preferred Field</label>
-                <input list="preferred-field-options" name="preferred_field" id="preferred_field">
-                <datalist id="preferred-field-options">
-                    {% for item in suggestions.preferred_fields %}<option value="{{ item }}">{% endfor %}
-                </datalist>
-            </div>
+        <input type="submit" value="Get Career Prediction">
+    </form>
 
-            <button type="submit">Get Career Prediction</button>
-        </form>
-
-        {% if result %}
-        <div class="result">
-            <strong>Prediction Result:</strong><br>{{ result|safe }}
-        </div>
-        {% endif %}
-
-        <hr>
-
-        <form method="POST" action="/chat">
-            <div class="form-group">
-                <label for="question">Ask AI about Career Guidance:</label>
-                <textarea name="question" rows="4" placeholder="Type your question..."></textarea>
-            </div>
-            <button type="submit">Ask</button>
-        </form>
-
-        {% if chat_answer %}
-        <div class="chat-response">
-            <strong>AI Response:</strong><br>{{ chat_answer|safe }}
-        </div>
-        {% endif %}
+    {% if result %}
+    <div class="result">
+        <strong>Prediction Result:</strong><br>
+        {{ result }}
     </div>
+    {% endif %}
+
+    <form method="POST" action="/chat">
+        <h3>Ask AI Career Questions</h3>
+        <input type="text" name="question" placeholder="e.g. What career is best for a coder?">
+        <input type="submit" value="Ask AI">
+    </form>
+
+    {% if chat_answer %}
+    <div class="result">
+        <strong>AI Answer:</strong><br>
+        {{ chat_answer }}
+    </div>
+    {% endif %}
 </body>
 </html>
