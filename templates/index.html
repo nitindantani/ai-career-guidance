@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Career Guidance System</title>
+    <title>AI-Based Career Guidance System</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,7 +14,7 @@
         }
 
         .container {
-            max-width: 600px;
+            max-width: 650px;
             margin: 30px auto;
             padding: 20px;
             background: #ffffff;
@@ -58,12 +59,65 @@
             background-color: #45a049;
         }
 
+        input[type="submit"]:disabled {
+            background-color: #9e9e9e;
+            cursor: not-allowed;
+        }
+
         .result {
             margin-top: 20px;
             background: #e3f2fd;
             padding: 15px;
             border-left: 5px solid #2196F3;
             border-radius: 8px;
+            white-space: pre-line;
+        }
+
+        /* Loader */
+        #loader {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .spinner {
+            width: 35px;
+            height: 35px;
+            border: 4px solid #ddd;
+            border-top: 4px solid #4CAF50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: auto;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Autocomplete */
+        .autocomplete-box {
+            position: relative;
+        }
+
+        .suggestion-list {
+            position: absolute;
+            width: 100%;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            max-height: 160px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .suggestion-list div {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .suggestion-list div:hover,
+        .suggestion-list .active {
+            background-color: #e3f2fd;
         }
 
         @media (max-width: 600px) {
@@ -71,85 +125,207 @@
                 margin: 10px;
                 padding: 15px;
             }
-
-            input[type="submit"] {
-                font-size: 15px;
-            }
-
-            select, input[type="text"] {
-                font-size: 15px;
-            }
         }
     </style>
+
     <script>
+        function showLoader(btn) {
+            btn.disabled = true;
+            document.getElementById("loader").style.display = "block";
+        }
+
         function updateSuggestions() {
-            const form = document.querySelector('form[action="/predict"]');
-            form.submit();
+            document.querySelector('form[action="/predict"]').submit();
+        }
+
+        function typeText(element, text, speed = 20) {
+            element.innerHTML = "";
+            let i = 0;
+            let interval = setInterval(() => {
+                element.innerHTML += text.charAt(i);
+                i++;
+                if (i >= text.length) clearInterval(interval);
+            }, speed);
         }
     </script>
 </head>
+
 <body>
-    <div class="container">
-        <h2>AI-Based Career Guidance</h2>
-        <form method="POST" action="/predict">
-            <label>Stream</label>
-            <select name="stream" onchange="updateSuggestions()">
-                <option value="">Select Stream</option>
-                {% for stream in streams %}
-                <option value="{{ stream }}" {% if request.form.get('stream') == stream %}selected{% endif %}>{{ stream|capitalize }}</option>
-                {% endfor %}
-            </select>
+<div class="container">
 
-            <label>Subject You Like</label>
-            <select name="subject_liked">
-                {% for option in suggestions.subjects %}
-                <option value="{{ option }}" {% if request.form.get('subject_liked') == option %}selected{% endif %}>{{ option|capitalize }}</option>
-                {% endfor %}
-            </select>
+    <h2>AI-Based Career Guidance</h2>
 
-            <label>Technical Skills</label>
-            <select name="skills">
-                {% for option in suggestions.skills %}
-                <option value="{{ option }}" {% if request.form.get('skills') == option %}selected{% endif %}>{{ option|capitalize }}</option>
-                {% endfor %}
-            </select>
+    <!-- Career Prediction -->
+    <form method="POST" action="/predict">
+        <label>Stream</label>
+        <select name="stream" onchange="updateSuggestions()">
+            <option value="">Select Stream</option>
+            {% for stream in streams %}
+            <option value="{{ stream }}" {% if request.form.get('stream') == stream %}selected{% endif %}>
+                {{ stream|capitalize }}
+            </option>
+            {% endfor %}
+        </select>
 
-            <label>Soft Skills</label>
-            <select name="soft_skill">
-                {% for option in suggestions.soft_skills %}
-                <option value="{{ option }}" {% if request.form.get('soft_skill') == option %}selected{% endif %}>{{ option|capitalize }}</option>
-                {% endfor %}
-            </select>
+        <label>Subject You Like</label>
+        <select name="subject_liked">
+            {% for option in suggestions.subjects %}
+            <option value="{{ option }}" {% if request.form.get('subject_liked') == option %}selected{% endif %}>
+                {{ option|capitalize }}
+            </option>
+            {% endfor %}
+        </select>
 
-            <label>Preferred Field</label>
-            <select name="preferred_field">
-                {% for option in suggestions.preferred_fields %}
-                <option value="{{ option }}" {% if request.form.get('preferred_field') == option %}selected{% endif %}>{{ option|capitalize }}</option>
-                {% endfor %}
-            </select>
+        <label>Technical Skills</label>
+        <select name="skills">
+            {% for option in suggestions.skills %}
+            <option value="{{ option }}" {% if request.form.get('skills') == option %}selected{% endif %}>
+                {{ option|capitalize }}
+            </option>
+            {% endfor %}
+        </select>
 
-            <input type="submit" value="Get Career Prediction">
-        </form>
+        <label>Soft Skills</label>
+        <select name="soft_skill">
+            {% for option in suggestions.soft_skills %}
+            <option value="{{ option }}" {% if request.form.get('soft_skill') == option %}selected{% endif %}>
+                {{ option|capitalize }}
+            </option>
+            {% endfor %}
+        </select>
 
-        {% if result %}
-        <div class="result">
-            <strong>Prediction Result:</strong><br>
-            {{ result }}
-        </div>
-        {% endif %}
+        <label>Preferred Field</label>
+        <select name="preferred_field">
+            {% for option in suggestions.preferred_fields %}
+            <option value="{{ option }}" {% if request.form.get('preferred_field') == option %}selected{% endif %}>
+                {{ option|capitalize }}
+            </option>
+            {% endfor %}
+        </select>
 
-        <form method="POST" action="/chat">
-            <h3>Ask AI Career Questions</h3>
-            <input type="text" name="question" placeholder="e.g. What career is best for a coder?" required>
-            <input type="submit" value="Ask AI">
-        </form>
+        <input type="submit" value="Get Career Prediction" onclick="showLoader(this)">
+    </form>
 
-        {% if chat_answer %}
-        <div class="result">
-            <strong>AI Answer:</strong><br>
-            {{ chat_answer }}
-        </div>
-        {% endif %}
+    <!-- Loader -->
+    <div id="loader">
+        <div class="spinner"></div>
+        <p>AI is thinking...</p>
     </div>
+
+    {% if result %}
+    <div class="result">
+        <strong>Prediction Result:</strong><br>
+        {{ result }}
+    </div>
+    {% endif %}
+
+    <!-- AI Chat -->
+    <form method="POST" action="/chat">
+        <h3>Ask AI Career Questions</h3>
+
+        <div class="autocomplete-box">
+            <input type="text"
+                   id="aiInput"
+                   name="question"
+                   placeholder="Type your career question..."
+                   autocomplete="off"
+                   required>
+            <div id="suggestions" class="suggestion-list" style="display:none;"></div>
+        </div>
+
+        <input type="submit" value="Ask AI" onclick="showLoader(this)">
+    </form>
+
+    {% if chat_answer %}
+    <div class="result">
+        <strong>AI Answer:</strong><br>
+        <div id="aiText"></div>
+    </div>
+
+    <script>
+        typeText(
+            document.getElementById("aiText"),
+            {{ chat_answer|tojson }}
+        );
+    </script>
+    {% endif %}
+
+</div>
+
+<script>
+const aiInput = document.getElementById("aiInput");
+const suggestionBox = document.getElementById("suggestions");
+
+const careerSuggestions = [
+    "What career is best for me?",
+    "Best career after computer engineering",
+    "Skills required for data scientist",
+    "Career options in artificial intelligence",
+    "How to become a software engineer",
+    "Future scope of machine learning",
+    "Career roadmap for web developer",
+    "Best career for analytical thinking",
+    "Which career has highest salary?",
+    "What jobs match my skills?"
+];
+
+let currentIndex = -1;
+
+aiInput.addEventListener("input", () => {
+    const value = aiInput.value.toLowerCase();
+    suggestionBox.innerHTML = "";
+    currentIndex = -1;
+
+    if (!value) {
+        suggestionBox.style.display = "none";
+        return;
+    }
+
+    const matches = careerSuggestions.filter(s =>
+        s.toLowerCase().includes(value)
+    );
+
+    if (!matches.length) {
+        suggestionBox.style.display = "none";
+        return;
+    }
+
+    matches.forEach(text => {
+        const div = document.createElement("div");
+        div.innerText = text;
+        div.onclick = () => {
+            aiInput.value = text;
+            suggestionBox.style.display = "none";
+        };
+        suggestionBox.appendChild(div);
+    });
+
+    suggestionBox.style.display = "block";
+});
+
+aiInput.addEventListener("keydown", e => {
+    const items = suggestionBox.querySelectorAll("div");
+    if (!items.length) return;
+
+    if (e.key === "ArrowDown") currentIndex = (currentIndex + 1) % items.length;
+    else if (e.key === "ArrowUp") currentIndex = (currentIndex - 1 + items.length) % items.length;
+    else if (e.key === "Enter" && currentIndex >= 0) {
+        aiInput.value = items[currentIndex].innerText;
+        suggestionBox.style.display = "none";
+        return;
+    } else return;
+
+    items.forEach(i => i.classList.remove("active"));
+    items[currentIndex].classList.add("active");
+    e.preventDefault();
+});
+
+document.addEventListener("click", e => {
+    if (!e.target.closest(".autocomplete-box")) {
+        suggestionBox.style.display = "none";
+    }
+});
+</script>
+
 </body>
 </html>
