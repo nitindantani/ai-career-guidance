@@ -14,26 +14,28 @@ model = joblib.load("career_model.pkl")
 encoders = joblib.load("encoders.pkl")
 target_encoder = joblib.load("target_encoder.pkl")
 
-# ---------------- OPENAI CLIENT (NEW) ----------------
+# ---------------- OPENAI CLIENT ----------------
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # ---------------- LOAD DATA ----------------
 df = pd.read_csv("career_data.csv")
-df = df.apply(lambda col: col.str.lower().str.strip() if col.dtype == 'object' else col)
+df = df.apply(lambda col: col.str.lower().str.strip() if col.dtype == "object" else col)
 
-streams = sorted(df['stream'].dropna().unique())
-grouped_data = df.groupby('stream')
+streams = sorted(df["stream"].dropna().unique())
+grouped_data = df.groupby("stream")
 
 # ---------------- HELPERS ----------------
 def get_options_for_stream(stream):
+    if not stream:
+        return {}
     stream = stream.lower().strip()
     if stream in grouped_data.groups:
         g = grouped_data.get_group(stream)
         return {
-            'subjects': sorted(g['subject_liked'].unique()),
-            'skills': sorted(g['skills'].unique()),
-            'soft_skills': sorted(g['soft_skill'].unique()),
-            'preferred_fields': sorted(g['preferred_field'].unique())
+            "subjects": sorted(g["subject_liked"].unique()),
+            "skills": sorted(g["skills"].unique()),
+            "soft_skills": sorted(g["soft_skill"].unique()),
+            "preferred_fields": sorted(g["preferred_field"].unique()),
         }
     return {}
 
@@ -52,12 +54,12 @@ Preferred Field: {inputs[4]}
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[{"role": "user", "content": prompt}],
-        max_tokens=200
+        max_tokens=200,
     )
     return response.choices[0].message.content.strip()
 
 # ---------------- ROUTES ----------------
-@app.route('/')
+@app.route("/")
 def home():
     return render_template("index.html", streams=streams, suggestions={})
 
@@ -66,12 +68,16 @@ def predict():
     fields = ["stream", "subject_liked", "skills", "soft_skill", "preferred_field"]
     inputs = [request.form.get(f, "").strip().lower() for f in fields]
 
+    # Defensive default
+    suggestions = get_options_for_stream(inputs[0]) if inputs[0] else {}
+
+    # Validation
     if not all(inputs):
         return render_template(
             "index.html",
             streams=streams,
-            suggestions=get_options_for_stream(inputs[0]) if inputs[0] else {},
-            result="Please fill all fields."
+            suggestions=suggestions,
+            result="Please fill all fields.",
         )
 
     try:
@@ -79,42 +85,23 @@ def predict():
         for f, v in zip(fields, inputs):
             val = safe_encode(encoders[f], v)
             if val == -1:
-                raise ValueError("Unseen input")
+                raise ValueError(f"Unseen value for {f}")
             encoded.append(val)
 
         pred = model.predict([encoded])[0]
         result = target_encoder.inverse_transform([pred])[0]
+        logging.info("Prediction generated using ML model")
 
     except Exception as e:
-        logging.warning(f"ML failed: {e}")
+        logging.warning(f"ML failed, switching to AI fallback: {e}")
         result = "AI-based suggestion:\n\n" + ai_career_fallback(inputs)
 
     return render_template(
         "index.html",
         streams=streams,
-        suggestions=get_options_for_stream(inputs[0]),
-        result=result
+        suggestions=suggestions,
+        result=result,
     )
-
-@app.route("/chat", methods=["POST"])
-def chat():
-    question = request.form.get("question", "").strip()
-
-    if not question:
-        return render_template("index.html", streams=streams, suggestions={}, chat_answer="Please ask a question.")
-
-    try:
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": question}],
-            max_tokens=200
-        )
-        answer = response.choices[0].message.content.strip()
-    except Exception as e:
-        logging.error(f"Chat error: {e}")
-        answer = "AI service is temporarily unavailable."
-
-    return render_template("index.html", streams=streams, suggestions={}, chat_answer=answer)
 
 # ---------------- RUN ----------------
 if __name__ == "__main__":
