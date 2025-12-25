@@ -1,13 +1,13 @@
 import pandas as pd
-from sklearn.preprocessing import LabelEncoder
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report
 import joblib
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.metrics import accuracy_score
 
-# --------------------------------------------------
-# CONFIG (FIXED FEATURE ORDER)
-# --------------------------------------------------
+# ---------------- CONFIG ----------------
 FEATURES = [
     "stream",
     "subject_liked",
@@ -17,71 +17,46 @@ FEATURES = [
 ]
 TARGET = "career_label"
 
-# --------------------------------------------------
-# LOAD DATA
-# --------------------------------------------------
+# ---------------- LOAD DATA ----------------
 df = pd.read_csv("career_data.csv")
 
-# Normalize strings
+# Normalize text
 df = df.apply(lambda col: col.str.lower().str.strip() if col.dtype == "object" else col)
 
-# --------------------------------------------------
-# VALIDATION (IMPORTANT)
-# --------------------------------------------------
-missing_cols = [c for c in FEATURES + [TARGET] if c not in df.columns]
-if missing_cols:
-    raise ValueError(f"Missing columns in dataset: {missing_cols}")
-
-# --------------------------------------------------
-# ENCODE FEATURES
-# --------------------------------------------------
-encoders = {}
-
-for col in FEATURES:
-    le = LabelEncoder()
-    df[col] = le.fit_transform(df[col])
-    encoders[col] = le
-
-# --------------------------------------------------
-# ENCODE TARGET
-# --------------------------------------------------
-target_encoder = LabelEncoder()
-df[TARGET] = target_encoder.fit_transform(df[TARGET])
-
-# --------------------------------------------------
-# SPLIT DATA
-# --------------------------------------------------
 X = df[FEATURES]
 y = df[TARGET]
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42, stratify=y
+# ---------------- PREPROCESSOR ----------------
+preprocessor = ColumnTransformer(
+    transformers=[
+        ("cat", OneHotEncoder(handle_unknown="ignore"), FEATURES)
+    ]
 )
 
-# --------------------------------------------------
-# TRAIN MODEL
-# --------------------------------------------------
+# ---------------- MODEL ----------------
 model = RandomForestClassifier(
-    n_estimators=200,
+    n_estimators=300,
     random_state=42,
     n_jobs=-1
 )
 
-model.fit(X_train, y_train)
+# ---------------- PIPELINE ----------------
+pipeline = Pipeline(steps=[
+    ("preprocessor", preprocessor),
+    ("model", model)
+])
 
-# --------------------------------------------------
-# EVALUATE
-# --------------------------------------------------
-y_pred = model.predict(X_test)
+# ---------------- TRAIN ----------------
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
 
-print("Accuracy:", accuracy_score(y_test, y_pred))
-print(classification_report(y_test, y_pred))
+pipeline.fit(X_train, y_train)
 
-# --------------------------------------------------
-# SAVE ARTIFACTS
-# --------------------------------------------------
-joblib.dump(model, "career_model.pkl")
-joblib.dump(encoders, "encoders.pkl")
-joblib.dump(target_encoder, "target_encoder.pkl")
+# ---------------- EVALUATE ----------------
+preds = pipeline.predict(X_test)
+print("Accuracy:", accuracy_score(y_test, preds))
 
-print("Model and encoders saved successfully")
+# ---------------- SAVE ----------------
+joblib.dump(pipeline, "career_model.pkl")
+print("Model saved successfully")
