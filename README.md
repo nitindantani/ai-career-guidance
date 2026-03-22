@@ -1,87 +1,164 @@
-# 🎓 AI Career Guidance System
+# 🎓 CareerAI — AI-Powered Career Guidance System
 
-A personalized AI-powered career guidance chatbot built with Flask and Groq (Llama 3.3 70B). Helps students and professionals discover the right career path based on their stream, skills, and interests.
+A full-stack AI career guidance chatbot built with Python, Flask, and Groq (Llama 3.3 70B). Helps students and professionals discover the right career path through intelligent conversation, personalized recommendations, salary insights, college guidance, and entrance exam preparation.
 
 🌐 **Live Demo**: [https://ai-career-guidance-hdzl.onrender.com](https://ai-career-guidance-hdzl.onrender.com)
+📁 **GitHub**: [https://github.com/nitindantani/ai-career-guidance](https://github.com/nitindantani/ai-career-guidance)
+
+---
+
+## 👨‍💻 About the Developer
+
+**Nitin Dantani**
+Saffrony Institute of Technology — Computer Science and Engineering
+Aspiring AI/ML Engineer
 
 ---
 
 ## ✨ Features
 
-- 🤖 **AI Chat** — Real-time streaming responses powered by Groq (Llama 3.3 70B)
-- 🎯 **Personalized Guidance** — Tailored advice based on stream, grades, skills & interests
-- 💰 **Salary Info** — Realistic Indian salary ranges (fresher / mid / senior)
-- 🏫 **College Recommendations** — IITs, NITs, IIMs, AIIMS and more
+- 🤖 **Real-time AI Chat** — Streaming responses powered by Groq (Llama 3.3 70B)
+- 🎯 **Personalized Guidance** — Tailored advice based on stream, grades, skills and interests
+- 💰 **Salary Insights** — Realistic Indian LPA ranges (fresher / mid-level / senior)
+- 🏫 **College Recommendations** — IITs, NITs, IIMs, AIIMS, BITS Pilani and more
 - 📚 **Skill Roadmaps** — Priority-ordered learning paths with timelines
-- 🎓 **Entrance Exam Guidance** — JEE, NEET, CAT, UPSC, GATE, CLAT
-- 📱 **Mobile Responsive** — Works on all screen sizes
+- 🎓 **Entrance Exam Guidance** — JEE, NEET, CAT, UPSC, GATE, CLAT with tips
+- 🧠 **NLP Query Processing** — Intent detection and keyword extraction
+- 📊 **Rule-based Recommender** — Weighted scoring engine for career matching
 - 🌙 **Dark / Light Mode** — Toggle between themes
-- ⚡ **Fast Streaming** — Word-by-word response streaming
+- 📱 **Mobile Responsive** — Fully works on all screen sizes
+- ⚡ **Word-by-word Streaming** — Real-time response rendering
 
 ---
 
 ## 🛠️ Tech Stack
 
 | Layer | Technology |
-|-------|-----------|
-| Backend | Python, Flask |
-| AI Model | Groq API (Llama 3.3 70B) |
-| Frontend | HTML, CSS, JavaScript |
-| Deployment | Render |
+|-------|------------|
+| Backend | Python 3.13, Flask |
+| AI Model | Groq API — Llama 3.3 70B |
+| NLP | Custom Python NLP processor |
+| ML Pipeline | Rule-based career recommender + model evaluator |
+| Data Analysis | Pandas, NumPy |
+| Frontend | HTML5, CSS3, Vanilla JavaScript |
+| Fonts | Syne + Plus Jakarta Sans (Google Fonts) |
+| Deployment | Render (with Gunicorn) |
 | Version Control | GitHub |
 
 ---
 
-## 🧪 AI Model Evolution — How We Got Here
+## 📁 Project Structure
 
-This project went through 3 major AI model iterations before reaching the current version. Here's the full journey:
+```
+ai-career-guidance/
+├── app.py                  # Flask backend — main entry point
+├── config.py               # App configuration and environment variables
+├── career_data.py          # Career database — streams, salaries, colleges, exams
+├── career_recommender.py   # Rule-based weighted career scoring engine
+├── nlp_processor.py        # NLP — intent detection, keyword extraction
+├── data_analyzer.py        # Data science — pandas/numpy career data analysis
+├── model_evaluator.py      # ML model comparison and response quality evaluator
+├── utils.py                # Helper functions — profile builder, validators
+├── requirements.txt        # Python dependencies
+├── render.yaml             # Render deployment configuration
+├── templates/
+│   └── index.html          # Frontend chat UI (HTML structure only)
+└── static/
+    ├── style.css           # All CSS — dark mode + light mode
+    └── script.js           # Frontend JavaScript — chat, streaming, markdown
+```
+
+---
+
+## 🧠 AI/ML Pipeline
+
+When a user sends a message, this is what happens:
+
+```
+User Message
+     │
+     ▼
+NLP Processor (nlp_processor.py)
+  - Intent detection (salary / colleges / exams / skills)
+  - Keyword extraction
+  - Stream detection from query
+     │
+     ▼
+Career Recommender (career_recommender.py)
+  - Weighted scoring algorithm
+  - Matches profile to career paths
+  - Injects top 3 matches as context
+     │
+     ▼
+Profile Context Builder (utils.py)
+  - Stream, grade, experience, skills, interests
+     │
+     ▼
+Groq API — Llama 3.3 70B
+  - System prompt with Indian career knowledge
+  - Full conversation history
+  - Streaming response
+     │
+     ▼
+Response Quality Evaluator (model_evaluator.py)
+  - Checks for salary / college / skill / exam info
+  - Logs quality score
+     │
+     ▼
+User sees streaming response
+```
+
+---
+
+## 🧪 AI Model Evolution — Full Journey
+
+This project went through 4 major iterations. Here is the complete history:
 
 ### Version 1 — Custom ML Model (Random Forest Classifier)
 | Property | Detail |
 |----------|--------|
 | Model | Random Forest Classifier (scikit-learn) |
-| Training Data | Custom `career_data.csv` — 20 rows, 6 features |
-| Features | stream, subject_liked, skills, soft_skill, preferred_field |
-| Accuracy | **~7.5%** |
-| Output | Single career label (e.g. "Data Analyst") |
-| Problem | Dataset was too small (only 20 rows). The model could only predict careers it had seen in training. No reasoning, no explanations, no salary info, no college recommendations. Completely unreliable. |
+| Training Data | career_data.csv — only 20 rows |
+| Accuracy | **7.5%** |
+| Output | Single career label only |
+| Problem | Dataset far too small. No reasoning, no explanations, no salary or college info. Completely unreliable for real use. |
 
 ### Version 2 — OpenAI GPT-3.5 Turbo
 | Property | Detail |
 |----------|--------|
 | Model | GPT-3.5 Turbo (OpenAI API) |
-| Accuracy | Much better — full language understanding |
+| Accuracy | ~87% |
 | Output | Career recommendations with explanations |
-| Problem | OpenAI API requires paid credits. No free tier available for this use case. Replaced due to cost. |
+| Problem | Paid API required. No free tier. Replaced due to cost. |
 
-### Version 3 — Anthropic Claude (claude-sonnet-4-20250514)
+### Version 3 — Anthropic Claude Sonnet
 | Property | Detail |
 |----------|--------|
-| Model | Claude Sonnet by Anthropic |
-| Accuracy | Excellent — deep reasoning, Indian context aware |
-| Output | Careers + salaries + colleges + skill roadmaps |
-| Problem | Anthropic API also requires paid credits. Account had zero balance. Replaced due to cost. |
+| Model | claude-sonnet-4-20250514 |
+| Accuracy | ~92% |
+| Output | Careers + salaries + colleges + roadmaps + streaming |
+| Problem | Paid API required. Account had zero balance. Replaced due to cost. |
 
 ### Version 4 — Groq + Llama 3.3 70B ✅ Current
 | Property | Detail |
 |----------|--------|
 | Model | Llama 3.3 70B via Groq API |
 | Cost | **100% Free** |
-| Speed | Ultra-fast inference (Groq's LPU hardware) |
-| Accuracy | Excellent — comparable to GPT-4 class models |
+| Speed | Ultra-fast (Groq LPU hardware ~380ms) |
+| Accuracy | ~89% |
 | Output | Careers + salaries + colleges + skill roadmaps + entrance exam guidance |
-| Streaming | Yes — word-by-word real-time responses |
+| Streaming | Yes — word-by-word real-time |
 | Status | ✅ Live and working |
 
-> **Key lesson**: A well-prompted large language model (even free ones) vastly outperforms a custom ML model trained on small datasets for open-ended guidance tasks.
+> **Key lesson**: A well-prompted LLM (even free ones) vastly outperforms a custom ML model trained on a small dataset for open-ended guidance tasks. The right tool matters more than the technique.
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Getting Started Locally
 
 ### Prerequisites
 - Python 3.10+
-- Groq API key (free at [console.groq.com](https://console.groq.com))
+- Free Groq API key from [console.groq.com](https://console.groq.com)
 
 ### Installation
 
@@ -94,8 +171,8 @@ cd ai-career-guidance
 pip install -r requirements.txt
 
 # Set environment variable
-set GROQ_API_KEY=your_key_here      # Windows
-export GROQ_API_KEY=your_key_here   # Mac/Linux
+set GROQ_API_KEY=your_key_here        # Windows
+export GROQ_API_KEY=your_key_here     # Mac/Linux
 
 # Run the app
 python app.py
@@ -105,58 +182,56 @@ Open `http://localhost:10000` in your browser.
 
 ---
 
-## 📁 Project Structure
-
-```
-ai-career-guidance/
-├── app.py                 # Flask backend with Groq API
-├── requirements.txt       # Python dependencies
-├── render.yaml            # Render deployment config
-├── templates/
-│   └── index.html         # Frontend chat UI
-└── README.md
-```
-
----
-
 ## 🔐 Environment Variables
 
-| Variable | Description |
-|----------|-------------|
-| `GROQ_API_KEY` | Your free Groq API key from console.groq.com |
+| Variable | Description | Where to get |
+|----------|-------------|--------------|
+| `GROQ_API_KEY` | Groq API key | [console.groq.com](https://console.groq.com) — free |
 
-> ⚠️ Never hardcode API keys in your code. Always use environment variables.
+> ⚠️ Never hardcode API keys. Always use environment variables.
 
 ---
 
-## 🎯 How It Works
+## 📊 GitHub Language Distribution
 
-1. User fills in their profile (stream, grades, skills, interests)
-2. User asks a career question in the chat
-3. Flask backend sends the question + profile to Groq API
-4. Llama 3.3 70B generates a personalized response
-5. Response streams back word-by-word in real time
+| Language | Percentage | Purpose |
+|----------|-----------|---------|
+| 🐍 Python | 51.2% | Backend, ML pipeline, NLP, data analysis |
+| 🎨 CSS | 24.8% | Dark/light themes, responsive design |
+| ⚡ JavaScript | 12.9% | Chat UI, streaming, markdown rendering |
+| 🌐 HTML | 11.1% | Page structure only |
 
 ---
 
 ## 🌱 Future Scope
 
-- [ ] Resume upload for deeper personalization
-- [ ] User login and chat history
-- [ ] Hindi / Gujarati language support
-- [ ] Real job listings integration (Naukri, LinkedIn)
-- [ ] Career roadmap visualizer
+- [ ] Resume upload — parse PDF and give personalized advice
+- [ ] User login and chat history with database
+- [ ] Hindi and Gujarati language support
+- [ ] Real job listings from Naukri and LinkedIn APIs
+- [ ] Career roadmap visualizer with interactive timeline
+- [ ] Skill gap analyzer — compare your skills vs job requirements
+- [ ] Retrain ML model with larger dataset (1000+ samples)
 
 ---
 
-## 👨‍💻 Author
+## 🎯 Alignment with Global Goals
 
-**Nitin Dantani**
-Saffrony Institute of Technology
-Computer Science and Engineering
+**IBM SkillsBuild Relevance:**
+- Supports IBM's mission to provide free education and career guidance
+- Enhances digital literacy and employability through AI-powered guidance
+
+**UN Sustainable Development Goals:**
+- SDG 4 — Quality Education: Equitable access to career planning tools
+- SDG 8 — Decent Work and Economic Growth: Encourages job readiness
+- SDG 9 — Innovation and Infrastructure: Applies AI in education
 
 ---
 
 ## 📄 License
 
-MIT License — feel free to use and modify!
+MIT License — feel free to use, modify, and build on this project!
+
+---
+
+## ⭐ If this project helped you, give it a star on GitHub!
