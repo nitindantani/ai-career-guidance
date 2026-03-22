@@ -1,78 +1,73 @@
-from flask import Flask, request, render_template, jsonify, stream_with_context, Response
+from flask import Flask, request, render_template
+import joblib
+import pandas as pd
+import logging
 import os
-import json
-import anthropic
 
 app = Flask(__name__)
+logging.basicConfig(level=logging.INFO)
 
-# Load Anthropic client — API key from environment variable
-client = anthropic.Anthropic(api_key=os.getenv("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"))
+# ---------------- LOAD MODEL ----------------
+try:
+    model = joblib.load("career_model.pkl")
+    logging.info("Model loaded successfully")
+except Exception as e:
+    logging.error(f"Model load failed: {e}")
+    model = None
 
-SYSTEM_PROMPT = """You are an expert AI career guidance counselor with deep knowledge of:
-- Indian and global career paths, job roles, and industries
-- Top universities and colleges (India: IITs, NITs, IIMs, AIIMS, top private universities; Global: Ivy League, Russell Group, etc.)
-- Current job market trends, salary ranges, and demand forecasts for 2024-2025
-- Certifications and online courses (Coursera, edX, NPTEL, Udemy, etc.) and skill roadmaps
-- Indian entrance exams: JEE, NEET, CAT, CLAT, UPSC, GATE, and more
-- Emerging career fields: AI/ML, Data Science, Cybersecurity, UX Design, Sustainable Energy, etc.
+# ---------------- LOAD DATA FOR UI ----------------
+df = pd.read_csv("career_data.csv")
+df = df.apply(lambda col: col.str.lower().str.strip() if col.dtype == "object" else col)
+streams = sorted(df["stream"].unique())
 
-When answering:
-1. Always give concrete, specific career recommendations — never vague advice
-2. For salary: provide realistic Indian salary ranges (fresher / mid-level / senior) and global equivalents where relevant
-3. For colleges: name specific top institutions with their strengths and admission requirements
-4. For skills: provide a clear, priority-ordered learning roadmap with timelines
-5. Structure responses with clear sections using markdown formatting
-6. Be honest about competition levels and realistic timelines
-7. Always consider the student's specific profile (stream, grades, skills, interests) when provided
-8. End every response with 2-3 concrete, actionable next steps
-9. Use bullet points for lists and **bold** for important terms
-10. Keep responses focused and practical — students need actionable guidance, not essays"""
-
-
+# ---------------- ROUTES ----------------
 @app.route("/")
 def home():
-    return render_template("index.html")
+    return render_template("index.html", streams=streams, suggestions={})
 
+@app.route("/predict", methods=["POST"])
+def predict():
+    try:
+        inputs = {
+            "stream": request.form.get("stream", "").lower(),
+            "subject_liked": request.form.get("subject_liked", "").lower(),
+            "skills": request.form.get("skills", "").lower(),
+            "soft_skill": request.form.get("soft_skill", "").lower(),
+            "preferred_field": request.form.get("preferred_field", "").lower(),
+        }
 
-@app.route("/chat", methods=["POST"])
-def chat():
-    data = request.get_json()
-    messages = data.get("messages", [])
-    profile = data.get("profile", {})
+        if not all(inputs.values()):
+            return render_template(
+                "index.html",
+                streams=streams,
+                suggestions={},
+                result="Please fill all fields."
+            )
 
-    if not messages:
-        return jsonify({"error": "No messages provided"}), 400
+        input_df = pd.DataFrame([inputs])
 
-    # Inject profile into the last user message if profile data exists
-    profile_parts = []
-    if profile.get("stream"):
-        profile_parts.append(f"Stream: {profile['stream']}")
-    if profile.get("grade"):
-        profile_parts.append(f"Academic performance: {profile['grade']}")
-    if profile.get("workexp"):
-        profile_parts.append(f"Work experience: {profile['workexp']}")
-    if profile.get("skills"):
-        profile_parts.append(f"Skills: {', '.join(profile['skills'])}")
-    if profile.get("interests"):
-        profile_parts.append(f"Interests: {', '.join(profile['interests'])}")
+        if model:
+            prediction = model.predict(input_df)[0]
+            result = f"Recommended career path: {prediction}"
+        else:
+            result = "Prediction service unavailable."
 
-    if profile_parts:
-        messages[-1]["content"] += f"\n\n[My profile — {' | '.join(profile_parts)}]"
+        return render_template(
+            "index.html",
+            streams=streams,
+            suggestions={},
+            result=result
+        )
 
-    def generate():
-        with client.messages.stream(
-            model="claude-sonnet-4-20250514",
-            max_tokens=1024,
-            system=SYSTEM_PROMPT,
-            messages=messages
-        ) as stream:
-            for text in stream.text_stream:
-                yield f"data: {json.dumps({'text': text})}\n\n"
-        yield "data: [DONE]\n\n"
-
-    return Response(stream_with_context(generate()), mimetype="text/event-stream")
-
+    except Exception as e:
+        logging.error(f"Prediction error: {e}")
+        return render_template(
+            "index.html",
+            streams=streams,
+            suggestions={},
+            result="Something went wrong. Please try again."
+        )
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app.run(host="0.0.0.0", port=port)
