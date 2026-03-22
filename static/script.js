@@ -6,7 +6,7 @@ let isDark = true;
 function toggleTheme() {
   isDark = !isDark;
   document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-  document.getElementById('theme-btn').textContent = isDark ? '\uD83C\uDF19' : '\u2600\uFE0F';
+  document.getElementById('theme-btn').textContent = isDark ? '🌙' : '☀️';
 }
 
 function openSidebar() {
@@ -20,11 +20,11 @@ function closeSidebar() {
 }
 
 function renderTags() {
-  const skillColors = ['tag-accent', 'tag-teal', 'tag-coral'];
+  const colors = ['tag-accent', 'tag-teal', 'tag-coral'];
   document.getElementById('skill-tags').innerHTML =
-    skillTags.map((t, i) => `<span class="tag ${skillColors[i % 3]}" onclick="removeTag('skill','${t}')" title="Remove">${t} x</span>`).join('');
+    skillTags.map((t, i) => `<span class="tag ${colors[i % 3]}" onclick="removeTag('skill','${t}')">${t} x</span>`).join('');
   document.getElementById('interest-tags').innerHTML =
-    interestTags.map((t, i) => `<span class="tag ${skillColors[(i+1) % 3]}" onclick="removeTag('interest','${t}')" title="Remove">${t} x</span>`).join('');
+    interestTags.map((t, i) => `<span class="tag ${colors[(i+1) % 3]}" onclick="removeTag('interest','${t}')">${t} x</span>`).join('');
 }
 
 function addTag(type) {
@@ -61,8 +61,8 @@ function getProfile() {
   };
 }
 
-function renderMarkdown(text) {
-  const lines = text.split('\n');
+function renderMarkdown(raw) {
+  const lines = raw.split('\n');
   let html = '';
   let inUl = false;
   let inOl = false;
@@ -71,80 +71,69 @@ function renderMarkdown(text) {
   function closeOl() { if (inOl) { html += '</ol>'; inOl = false; } }
   function closeLists() { closeUl(); closeOl(); }
 
-  for (let i = 0; i < lines.length; i++) {
-    let line = lines[i];
-
-    // escape HTML
-    line = line
+  function inlineFormat(line) {
+    return line
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-
-    // inline formatting
-    line = line
+      .replace(/>/g, '&gt;')
       .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.+?)\*/g, '<em>$1</em>')
       .replace(/__(.+?)__/g, '<strong>$1</strong>')
       .replace(/_(.+?)_/g, '<em>$1</em>')
       .replace(/`(.+?)`/g, '<code>$1</code>');
+  }
 
-    // headings #### ### ##  #
-    if (/^####\s+(.+)/.test(line)) {
+  for (let i = 0; i < lines.length; i++) {
+    const raw_line = lines[i];
+    const trimmed = raw_line.trim();
+    const line = inlineFormat(raw_line);
+    const trimmedFormatted = inlineFormat(trimmed);
+
+    // skip empty lines
+    if (trimmed === '') {
       closeLists();
-      html += '<h3>' + line.replace(/^####\s+/, '') + '</h3>';
-      continue;
-    }
-    if (/^###\s+(.+)/.test(line)) {
-      closeLists();
-      html += '<h3>' + line.replace(/^###\s+/, '') + '</h3>';
-      continue;
-    }
-    if (/^##\s+(.+)/.test(line)) {
-      closeLists();
-      html += '<h2>' + line.replace(/^##\s+/, '') + '</h2>';
-      continue;
-    }
-    if (/^#\s+(.+)/.test(line)) {
-      closeLists();
-      html += '<h2>' + line.replace(/^#\s+/, '') + '</h2>';
       continue;
     }
 
     // horizontal rule
-    if (/^---+$/.test(line.trim()) || /^\*\*\*+$/.test(line.trim())) {
+    if (/^[-*]{3,}$/.test(trimmed)) {
       closeLists();
       html += '<hr>';
       continue;
     }
 
-    // unordered bullets: - * + • ➤ ▸ →
-    if (/^[\s]*[-*+•➤▸→]\s+(.+)/.test(line)) {
+    // headings: ##### #### ### ## #
+    if (/^#{1,6}\s/.test(trimmed)) {
+      closeLists();
+      const level = trimmed.match(/^(#{1,6})\s/)[1].length;
+      const content = inlineFormat(trimmed.replace(/^#{1,6}\s+/, ''));
+      const tag = level <= 2 ? 'h2' : 'h3';
+      html += '<' + tag + '>' + content + '</' + tag + '>';
+      continue;
+    }
+
+    // unordered list: - * + • ➤ ▸ → (with any leading spaces)
+    if (/^\s*[-*+•➤▸→]\s+/.test(raw_line)) {
       closeOl();
       if (!inUl) { html += '<ul>'; inUl = true; }
-      const content = line.replace(/^[\s]*[-*+•➤▸→]\s+/, '');
+      const content = inlineFormat(raw_line.replace(/^\s*[-*+•➤▸→]\s+/, ''));
       html += '<li>' + content + '</li>';
       continue;
     }
 
-    // ordered list: 1. 2. 3. or 1) 2) 3)
-    if (/^[\s]*\d+[.)]\s+(.+)/.test(line)) {
+    // ordered list: 1. or 1) (with any leading spaces)
+    if (/^\s*\d+[.)]\s+/.test(raw_line)) {
       closeUl();
       if (!inOl) { html += '<ol>'; inOl = true; }
-      const content = line.replace(/^[\s]*\d+[.)]\s+/, '');
+      const content = inlineFormat(raw_line.replace(/^\s*\d+[.)]\s+/, ''));
       html += '<li>' + content + '</li>';
-      continue;
-    }
-
-    // empty line
-    if (line.trim() === '') {
-      closeLists();
       continue;
     }
 
     // normal paragraph
     closeLists();
-    html += '<p>' + line + '</p>';
+    html += '<p>' + trimmedFormatted + '</p>';
   }
 
   closeLists();
@@ -152,17 +141,24 @@ function renderMarkdown(text) {
 }
 
 function getWelcomeHTML() {
-  return '<div class="welcome" id="welcome">' +
-    '<div class="welcome-glyph"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>' +
-    '<h2>Your AI Career Advisor</h2>' +
-    '<p>Fill in your profile on the left, then ask me anything about careers, colleges, salaries, skills, or entrance exams.</p>' +
-    '<div class="welcome-chips">' +
-    '<div class="chip" onclick="quickAsk(\'What careers suit a Science PCM student who loves coding?\')">PCM + coding</div>' +
-    '<div class="chip" onclick="quickAsk(\'Best careers after Commerce for a creative person?\')">Creative commerce</div>' +
-    '<div class="chip" onclick="quickAsk(\'I have 3 years of IT experience, what is my next move?\')">IT next step</div>' +
-    '<div class="chip" onclick="quickAsk(\'What is the scope of Data Science in India in 2025?\')">Data Science scope</div>' +
-    '<div class="chip" onclick="quickAsk(\'How do I prepare for JEE, NEET or CAT exam?\')">Entrance exam prep</div>' +
-    '</div></div>';
+  return `<div class="welcome" id="welcome">
+    <div class="welcome-glyph">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+        <path d="M2 17l10 5 10-5"/>
+        <path d="M2 12l10 5 10-5"/>
+      </svg>
+    </div>
+    <h2>Your AI Career Advisor</h2>
+    <p>Fill in your profile on the left, then ask me anything about careers, colleges, salaries, skills, or entrance exams.</p>
+    <div class="welcome-chips">
+      <div class="chip" onclick="quickAsk('What careers suit a Science PCM student who loves coding?')">PCM + coding</div>
+      <div class="chip" onclick="quickAsk('Best careers after Commerce for a creative person?')">Creative commerce</div>
+      <div class="chip" onclick="quickAsk('I have 3 years of IT experience, what is my next move?')">IT next step</div>
+      <div class="chip" onclick="quickAsk('What is the scope of Data Science in India in 2025?')">Data Science scope</div>
+      <div class="chip" onclick="quickAsk('How do I prepare for JEE, NEET or CAT exam?')">Entrance exam prep</div>
+    </div>
+  </div>`;
 }
 
 function addUserMessage(text) {
@@ -203,7 +199,7 @@ async function sendMessage(overrideText) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        messages: conversationHistory.map(function(m) { return { role: m.role, content: m.content }; }),
+        messages: conversationHistory.map(m => ({ role: m.role, content: m.content })),
         profile: getProfile()
       })
     });
@@ -212,12 +208,10 @@ async function sendMessage(overrideText) {
     let fullText = '';
     bubble.innerHTML = '';
     while (true) {
-      const result = await reader.read();
-      if (result.done) break;
-      const chunk = decoder.decode(result.value, { stream: true });
-      const lines = chunk.split('\n');
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value, { stream: true });
+      for (const line of chunk.split('\n')) {
         if (line.startsWith('data: ')) {
           const data = line.slice(6);
           if (data === '[DONE]') break;
