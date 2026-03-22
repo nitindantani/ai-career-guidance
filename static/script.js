@@ -62,41 +62,98 @@ function getProfile() {
 }
 
 function renderMarkdown(text) {
-  text = text
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/`(.*?)`/g, '<code>$1</code>')
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^---$/gm, '<hr>');
   const lines = text.split('\n');
-  let html = '', inUl = false, inOl = false;
-  for (const line of lines) {
-    const ulMatch = line.match(/^[-*] (.+)/);
-    const olMatch = line.match(/^\d+\. (.+)/);
-    if (ulMatch) {
-      if (inOl) { html += '</ol>'; inOl = false; }
-      if (!inUl) { html += '<ul>'; inUl = true; }
-      html += '<li>' + ulMatch[1] + '</li>';
-    } else if (olMatch) {
-      if (inUl) { html += '</ul>'; inUl = false; }
-      if (!inOl) { html += '<ol>'; inOl = true; }
-      html += '<li>' + olMatch[1] + '</li>';
-    } else {
-      if (inUl) { html += '</ul>'; inUl = false; }
-      if (inOl) { html += '</ol>'; inOl = false; }
-      if (line.trim()) html += '<p>' + line + '</p>';
+  let html = '';
+  let inUl = false;
+  let inOl = false;
+
+  function closeUl() { if (inUl) { html += '</ul>'; inUl = false; } }
+  function closeOl() { if (inOl) { html += '</ol>'; inOl = false; } }
+  function closeLists() { closeUl(); closeOl(); }
+
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+
+    // escape HTML
+    line = line
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    // inline formatting
+    line = line
+      .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/__(.+?)__/g, '<strong>$1</strong>')
+      .replace(/_(.+?)_/g, '<em>$1</em>')
+      .replace(/`(.+?)`/g, '<code>$1</code>');
+
+    // headings #### ### ##  #
+    if (/^####\s+(.+)/.test(line)) {
+      closeLists();
+      html += '<h3>' + line.replace(/^####\s+/, '') + '</h3>';
+      continue;
     }
+    if (/^###\s+(.+)/.test(line)) {
+      closeLists();
+      html += '<h3>' + line.replace(/^###\s+/, '') + '</h3>';
+      continue;
+    }
+    if (/^##\s+(.+)/.test(line)) {
+      closeLists();
+      html += '<h2>' + line.replace(/^##\s+/, '') + '</h2>';
+      continue;
+    }
+    if (/^#\s+(.+)/.test(line)) {
+      closeLists();
+      html += '<h2>' + line.replace(/^#\s+/, '') + '</h2>';
+      continue;
+    }
+
+    // horizontal rule
+    if (/^---+$/.test(line.trim()) || /^\*\*\*+$/.test(line.trim())) {
+      closeLists();
+      html += '<hr>';
+      continue;
+    }
+
+    // unordered bullets: - * + • ➤ ▸ →
+    if (/^[\s]*[-*+•➤▸→]\s+(.+)/.test(line)) {
+      closeOl();
+      if (!inUl) { html += '<ul>'; inUl = true; }
+      const content = line.replace(/^[\s]*[-*+•➤▸→]\s+/, '');
+      html += '<li>' + content + '</li>';
+      continue;
+    }
+
+    // ordered list: 1. 2. 3. or 1) 2) 3)
+    if (/^[\s]*\d+[.)]\s+(.+)/.test(line)) {
+      closeUl();
+      if (!inOl) { html += '<ol>'; inOl = true; }
+      const content = line.replace(/^[\s]*\d+[.)]\s+/, '');
+      html += '<li>' + content + '</li>';
+      continue;
+    }
+
+    // empty line
+    if (line.trim() === '') {
+      closeLists();
+      continue;
+    }
+
+    // normal paragraph
+    closeLists();
+    html += '<p>' + line + '</p>';
   }
-  if (inUl) html += '</ul>';
-  if (inOl) html += '</ol>';
+
+  closeLists();
   return html;
 }
 
 function getWelcomeHTML() {
   return '<div class="welcome" id="welcome">' +
-    '<div class="welcome-glyph"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>' +
+    '<div class="welcome-glyph"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>' +
     '<h2>Your AI Career Advisor</h2>' +
     '<p>Fill in your profile on the left, then ask me anything about careers, colleges, salaries, skills, or entrance exams.</p>' +
     '<div class="welcome-chips">' +
@@ -177,7 +234,7 @@ async function sendMessage(overrideText) {
     }
     conversationHistory.push({ role: 'assistant', content: fullText });
   } catch(err) {
-    bubble.innerHTML = renderMarkdown('Something went wrong. Please try again.');
+    bubble.innerHTML = '<p>Something went wrong. Please try again.</p>';
   }
   document.getElementById('send-btn').disabled = false;
 }
