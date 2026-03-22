@@ -11,7 +11,7 @@ services:
 
 ---
 
-**4. `.gitignore`** — put in root folder:
+**`.gitignore`**
 ```
 .env
 __pycache__/
