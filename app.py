@@ -69,12 +69,3 @@ def chat():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port, debug=False)
-```
-
----
-
-**`requirements.txt`**
-```
-flask==3.1.1
-groq==0.11.0
-gunicorn==23.0.0
