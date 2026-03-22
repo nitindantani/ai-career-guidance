@@ -7,21 +7,7 @@ app = Flask(__name__)
 
 client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
-SYSTEM_PROMPT = """You are an expert AI career guidance counselor with deep knowledge of:
-- Indian and global career paths, job roles, and industries
-- Top universities and colleges (India: IITs, NITs, IIMs, AIIMS, top private universities)
-- Current job market trends, salary ranges, and demand forecasts
-- Certifications and online courses (Coursera, edX, NPTEL, Udemy) and skill roadmaps
-- Indian entrance exams: JEE, NEET, CAT, CLAT, UPSC, GATE
-- Emerging fields: AI/ML, Data Science, Cybersecurity, UX Design
-
-When answering:
-1. Give concrete, specific career recommendations
-2. For salary: provide Indian ranges (fresher/mid/senior) and global equivalents
-3. For colleges: name specific top institutions with admission requirements
-4. For skills: provide a priority-ordered learning roadmap with timelines
-5. Use markdown formatting with clear sections
-6. Always end with 2-3 actionable next steps"""
+SYSTEM_PROMPT = """You are an expert AI career guidance counselor with deep knowledge of Indian and global career paths, top universities, salary ranges, certifications, and entrance exams like JEE, NEET, CAT, UPSC, GATE. Always give specific recommendations, realistic salary ranges, named colleges, and end with 2-3 actionable next steps."""
 
 
 @app.route("/")
@@ -40,18 +26,18 @@ def chat():
 
     profile_parts = []
     if profile.get("stream"):
-        profile_parts.append(f"Stream: {profile['stream']}")
+        profile_parts.append("Stream: " + profile["stream"])
     if profile.get("grade"):
-        profile_parts.append(f"Academic performance: {profile['grade']}")
+        profile_parts.append("Grade: " + profile["grade"])
     if profile.get("workexp"):
-        profile_parts.append(f"Work experience: {profile['workexp']}")
+        profile_parts.append("Experience: " + profile["workexp"])
     if profile.get("skills"):
-        profile_parts.append(f"Skills: {', '.join(profile['skills'])}")
+        profile_parts.append("Skills: " + ", ".join(profile["skills"]))
     if profile.get("interests"):
-        profile_parts.append(f"Interests: {', '.join(profile['interests'])}")
+        profile_parts.append("Interests: " + ", ".join(profile["interests"]))
 
     if profile_parts:
-        messages[-1]["content"] += f"\n\n[My profile: {' | '.join(profile_parts)}]"
+        messages[-1]["content"] += "\n\n[Profile: " + " | ".join(profile_parts) + "]"
 
     def generate():
         with client.messages.stream(
@@ -61,7 +47,7 @@ def chat():
             messages=messages
         ) as stream:
             for text in stream.text_stream:
-                yield f"data: {json.dumps({'text': text})}\n\n"
+                yield "data: " + json.dumps({"text": text}) + "\n\n"
         yield "data: [DONE]\n\n"
 
     return Response(stream_with_context(generate()), mimetype="text/event-stream")
@@ -72,7 +58,9 @@ if __name__ == "__main__":
     app.run(host="0.0.0.0", port=port, debug=False)
 ```
 
-Also replace `requirements.txt` with exactly this:
+---
+
+Then do the same for `requirements.txt` in Notepad — save it with exactly these 3 lines:
 ```
 flask==3.1.1
 anthropic==0.50.0
