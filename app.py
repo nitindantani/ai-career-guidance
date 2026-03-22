@@ -9,23 +9,19 @@ client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 SYSTEM_PROMPT = """You are an expert AI career guidance counselor with deep knowledge of:
 - Indian and global career paths, job roles, and industries
-- Top universities and colleges (India: IITs, NITs, IIMs, AIIMS, top private universities; Global: Ivy League, Russell Group, etc.)
-- Current job market trends, salary ranges, and demand forecasts for 2024-2025
-- Certifications and online courses (Coursera, edX, NPTEL, Udemy, etc.) and skill roadmaps
-- Indian entrance exams: JEE, NEET, CAT, CLAT, UPSC, GATE, and more
-- Emerging career fields: AI/ML, Data Science, Cybersecurity, UX Design, Sustainable Energy, etc.
+- Top universities and colleges (India: IITs, NITs, IIMs, AIIMS, top private universities)
+- Current job market trends, salary ranges, and demand forecasts
+- Certifications and online courses (Coursera, edX, NPTEL, Udemy) and skill roadmaps
+- Indian entrance exams: JEE, NEET, CAT, CLAT, UPSC, GATE
+- Emerging fields: AI/ML, Data Science, Cybersecurity, UX Design
 
 When answering:
-1. Always give concrete, specific career recommendations — never vague advice
-2. For salary: provide realistic Indian salary ranges (fresher / mid-level / senior) and global equivalents where relevant
-3. For colleges: name specific top institutions with their strengths and admission requirements
-4. For skills: provide a clear, priority-ordered learning roadmap with timelines
-5. Structure responses with clear sections using markdown formatting
-6. Be honest about competition levels and realistic timelines
-7. Always consider the student's specific profile (stream, grades, skills, interests) when provided
-8. End every response with 2-3 concrete, actionable next steps
-9. Use bullet points for lists and **bold** for important terms
-10. Keep responses focused and practical — students need actionable guidance, not essays"""
+1. Give concrete, specific career recommendations
+2. For salary: provide Indian ranges (fresher/mid/senior) and global equivalents
+3. For colleges: name specific top institutions with admission requirements
+4. For skills: provide a priority-ordered learning roadmap with timelines
+5. Use markdown formatting with clear sections
+6. Always end with 2-3 actionable next steps"""
 
 
 @app.route("/")
@@ -55,7 +51,7 @@ def chat():
         profile_parts.append(f"Interests: {', '.join(profile['interests'])}")
 
     if profile_parts:
-        messages[-1]["content"] += f"\n\n[My profile — {' | '.join(profile_parts)}]"
+        messages[-1]["content"] += f"\n\n[My profile: {' | '.join(profile_parts)}]"
 
     def generate():
         with client.messages.stream(
@@ -76,9 +72,8 @@ if __name__ == "__main__":
     app.run(host="0.0.0.0", port=port, debug=False)
 ```
 
-Then also check `requirements.txt` — it should only contain:
+Also replace `requirements.txt` with exactly this:
 ```
 flask==3.1.1
 anthropic==0.50.0
-python-dotenv==1.0.1
 gunicorn==23.0.0
