@@ -32,6 +32,51 @@ A personalized AI-powered career guidance chatbot built with Flask and Groq (Lla
 
 ---
 
+## 🧪 AI Model Evolution — How We Got Here
+
+This project went through 3 major AI model iterations before reaching the current version. Here's the full journey:
+
+### Version 1 — Custom ML Model (Random Forest Classifier)
+| Property | Detail |
+|----------|--------|
+| Model | Random Forest Classifier (scikit-learn) |
+| Training Data | Custom `career_data.csv` — 20 rows, 6 features |
+| Features | stream, subject_liked, skills, soft_skill, preferred_field |
+| Accuracy | **~7.5%** |
+| Output | Single career label (e.g. "Data Analyst") |
+| Problem | Dataset was too small (only 20 rows). The model could only predict careers it had seen in training. No reasoning, no explanations, no salary info, no college recommendations. Completely unreliable. |
+
+### Version 2 — OpenAI GPT-3.5 Turbo
+| Property | Detail |
+|----------|--------|
+| Model | GPT-3.5 Turbo (OpenAI API) |
+| Accuracy | Much better — full language understanding |
+| Output | Career recommendations with explanations |
+| Problem | OpenAI API requires paid credits. No free tier available for this use case. Replaced due to cost. |
+
+### Version 3 — Anthropic Claude (claude-sonnet-4-20250514)
+| Property | Detail |
+|----------|--------|
+| Model | Claude Sonnet by Anthropic |
+| Accuracy | Excellent — deep reasoning, Indian context aware |
+| Output | Careers + salaries + colleges + skill roadmaps |
+| Problem | Anthropic API also requires paid credits. Account had zero balance. Replaced due to cost. |
+
+### Version 4 — Groq + Llama 3.3 70B ✅ Current
+| Property | Detail |
+|----------|--------|
+| Model | Llama 3.3 70B via Groq API |
+| Cost | **100% Free** |
+| Speed | Ultra-fast inference (Groq's LPU hardware) |
+| Accuracy | Excellent — comparable to GPT-4 class models |
+| Output | Careers + salaries + colleges + skill roadmaps + entrance exam guidance |
+| Streaming | Yes — word-by-word real-time responses |
+| Status | ✅ Live and working |
+
+> **Key lesson**: A well-prompted large language model (even free ones) vastly outperforms a custom ML model trained on small datasets for open-ended guidance tasks.
+
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -49,8 +94,8 @@ cd ai-career-guidance
 pip install -r requirements.txt
 
 # Set environment variable
-set GROQ_API_KEY=your_key_here   # Windows
-export GROQ_API_KEY=your_key_here  # Mac/Linux
+set GROQ_API_KEY=your_key_here      # Windows
+export GROQ_API_KEY=your_key_here   # Mac/Linux
 
 # Run the app
 python app.py
@@ -78,13 +123,9 @@ ai-career-guidance/
 
 | Variable | Description |
 |----------|-------------|
-| `GROQ_API_KEY` | Your Groq API key from console.groq.com |
+| `GROQ_API_KEY` | Your free Groq API key from console.groq.com |
 
----
-
-## 📸 Screenshots
-
-> Add screenshots of your app here
+> ⚠️ Never hardcode API keys in your code. Always use environment variables.
 
 ---
 
@@ -103,15 +144,15 @@ ai-career-guidance/
 - [ ] Resume upload for deeper personalization
 - [ ] User login and chat history
 - [ ] Hindi / Gujarati language support
-- [ ] Real job listings integration
+- [ ] Real job listings integration (Naukri, LinkedIn)
 - [ ] Career roadmap visualizer
 
 ---
 
 ## 👨‍💻 Author
 
-**Nitin Dantani**  
-Saffrony Institute of Technology  
+**Nitin Dantani**
+Saffrony Institute of Technology
 Computer Science and Engineering
 
 ---
