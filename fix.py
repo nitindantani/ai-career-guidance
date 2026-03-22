@@ -1,4 +1,6 @@
-from flask import Flask, request, render_template, jsonify, stream_with_context, Response
+import os
+
+app_content = """from flask import Flask, request, render_template, jsonify, stream_with_context, Response
 import os
 import json
 import anthropic
@@ -30,7 +32,7 @@ def chat():
     if profile.get("interests"):
         profile_parts.append("Interests: " + ", ".join(profile["interests"]))
     if profile_parts:
-        messages[-1]["content"] += "\n\n[Profile: " + " | ".join(profile_parts) + "]"
+        messages[-1]["content"] += "\\n\\n[Profile: " + " | ".join(profile_parts) + "]"
     def generate():
         with client.messages.stream(
             model="claude-sonnet-4-20250514",
@@ -39,10 +41,24 @@ def chat():
             messages=messages
         ) as stream:
             for text in stream.text_stream:
-                yield "data: " + json.dumps({"text": text}) + "\n\n"
-        yield "data: [DONE]\n\n"
+                yield "data: " + json.dumps({"text": text}) + "\\n\\n"
+        yield "data: [DONE]\\n\\n"
     return Response(stream_with_context(generate()), mimetype="text/event-stream")
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port, debug=False)
+"""
+
+req_content = """flask==3.1.1
+anthropic==0.50.0
+gunicorn==23.0.0
+"""
+
+with open("app.py", "w", encoding="utf-8") as f:
+    f.write(app_content)
+print("app.py written OK")
+
+with open("requirements.txt", "w", encoding="utf-8") as f:
+    f.write(req_content)
+print("requirements.txt written OK")
