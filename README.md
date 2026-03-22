@@ -4,8 +4,6 @@ A full-stack AI career guidance chatbot built with Python, Flask, and Groq (Llam
 
 🌐 **Live Demo**: [https://ai-career-guidance-hdzl.onrender.com](https://ai-career-guidance-hdzl.onrender.com)
 
-📁 **GitHub**: [https://github.com/nitindantani/ai-career-guidance](https://github.com/nitindantani/ai-career-guidance)
-
 ---
 
 ## 👨‍💻 About the Developer
