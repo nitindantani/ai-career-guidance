@@ -2,5 +2,8 @@ services:
   - type: web
     name: ai-career-guidance
     env: python
-    buildCommand: ""
-    startCommand: "python app.py"
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app --bind 0.0.0.0:$PORT"
+    envVars:
+      - key: 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
+        sync: false

@@ -1,6 +1,11 @@
+.env
 __pycache__/
 *.pyc
-.env
+*.pkl
+*.pth
+venv/
 .venv/
-instance/
-*.sqlite3
+*.egg-info/
+dist/
+build/
+.DS_Store

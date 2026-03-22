@@ -1,46 +1,78 @@
-from flask import Flask, request, render_template
-import joblib
-import openai
+from flask import Flask, request, render_template, jsonify, stream_with_context, Response
+import os
+import json
+import anthropic
 
-# Initialize Flask
 app = Flask(__name__)
 
-# Load model and encoders
-model = joblib.load("career_model.pkl")
-encoders = joblib.load("encoders.pkl")
+# Load Anthropic client — API key from environment variable
+client = anthropic.Anthropic(api_key=os.getenv("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"))
 
-# OpenAI API Key
-import os
-openai.api_key = os.getenv("OPENAI_API_KEY")
+SYSTEM_PROMPT = """You are an expert AI career guidance counselor with deep knowledge of:
+- Indian and global career paths, job roles, and industries
+- Top universities and colleges (India: IITs, NITs, IIMs, AIIMS, top private universities; Global: Ivy League, Russell Group, etc.)
+- Current job market trends, salary ranges, and demand forecasts for 2024-2025
+- Certifications and online courses (Coursera, edX, NPTEL, Udemy, etc.) and skill roadmaps
+- Indian entrance exams: JEE, NEET, CAT, CLAT, UPSC, GATE, and more
+- Emerging career fields: AI/ML, Data Science, Cybersecurity, UX Design, Sustainable Energy, etc.
 
-# Home route
-@app.route('/')
+When answering:
+1. Always give concrete, specific career recommendations — never vague advice
+2. For salary: provide realistic Indian salary ranges (fresher / mid-level / senior) and global equivalents where relevant
+3. For colleges: name specific top institutions with their strengths and admission requirements
+4. For skills: provide a clear, priority-ordered learning roadmap with timelines
+5. Structure responses with clear sections using markdown formatting
+6. Be honest about competition levels and realistic timelines
+7. Always consider the student's specific profile (stream, grades, skills, interests) when provided
+8. End every response with 2-3 concrete, actionable next steps
+9. Use bullet points for lists and **bold** for important terms
+10. Keep responses focused and practical — students need actionable guidance, not essays"""
+
+
+@app.route("/")
 def home():
     return render_template("index.html")
 
-# Prediction route
-@app.route('/predict', methods=["POST"])
-def predict():
-    inputs = [request.form.get(field) for field in ['stream', 'subject_liked', 'skills', 'soft_skill', 'preferred_field']]
-    try:
-        encoded = [encoders[col].transform([val])[0] for col, val in zip(encoders, inputs)]
-        prediction = model.predict([encoded])[0]
-        result = encoders['career_label'].inverse_transform([prediction])[0]
-    except:
-        result = "Invalid input."
-    return render_template("index.html", result=result)
 
-# 💬 Chat route
-@app.route('/chat', methods=["POST"])
+@app.route("/chat", methods=["POST"])
 def chat():
-    user_question = request.form.get("question")
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": user_question}]
-    )
-    answer = response['choices'][0]['message']['content']
-    return render_template("index.html", chat_answer=answer)
+    data = request.get_json()
+    messages = data.get("messages", [])
+    profile = data.get("profile", {})
 
-# Run the app
+    if not messages:
+        return jsonify({"error": "No messages provided"}), 400
+
+    # Inject profile into the last user message if profile data exists
+    profile_parts = []
+    if profile.get("stream"):
+        profile_parts.append(f"Stream: {profile['stream']}")
+    if profile.get("grade"):
+        profile_parts.append(f"Academic performance: {profile['grade']}")
+    if profile.get("workexp"):
+        profile_parts.append(f"Work experience: {profile['workexp']}")
+    if profile.get("skills"):
+        profile_parts.append(f"Skills: {', '.join(profile['skills'])}")
+    if profile.get("interests"):
+        profile_parts.append(f"Interests: {', '.join(profile['interests'])}")
+
+    if profile_parts:
+        messages[-1]["content"] += f"\n\n[My profile — {' | '.join(profile_parts)}]"
+
+    def generate():
+        with client.messages.stream(
+            model="claude-sonnet-4-20250514",
+            max_tokens=1024,
+            system=SYSTEM_PROMPT,
+            messages=messages
+        ) as stream:
+            for text in stream.text_stream:
+                yield f"data: {json.dumps({'text': text})}\n\n"
+        yield "data: [DONE]\n\n"
+
+    return Response(stream_with_context(generate()), mimetype="text/event-stream")
+
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port, debug=False)
